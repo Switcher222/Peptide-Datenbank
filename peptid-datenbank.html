@@ -1,0 +1,2911 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PeptidBase – 47 Peptide Referenzdatenbank</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #08090b;
+  --surface: #0e1014;
+  --surface2: #13151a;
+  --border: #1c1f27;
+  --border2: #252830;
+  --text: #dde2ee;
+  --muted: #5a6075;
+  --accent: #00e5ff;
+  --accent2: #ff6b35;
+  --accent3: #7fff6b;
+  --accent4: #c46bff;
+  --warn: #ffcc02;
+  --red: #ff4455;
+  --green: #3ddc84;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* GRAIN OVERLAY */
+body::before {
+  content:'';
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:9999;opacity:.4;
+}
+
+/* HEADER */
+header {
+  border-bottom: 1px solid var(--border);
+  padding: 0 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  position: sticky;
+  top: 0;
+  background: rgba(8,9,11,0.95);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+}
+
+.logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.logo span { color: var(--text); }
+
+.header-badge {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border: 1px solid var(--border2);
+  padding: 4px 10px;
+}
+
+/* HERO */
+.hero {
+  padding: 80px 48px 60px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content:'';
+  position:absolute;top:-100px;left:-100px;
+  width:600px;height:600px;
+  background: radial-gradient(circle, rgba(0,229,255,0.05) 0%, transparent 65%);
+  pointer-events:none;
+}
+
+.hero::after {
+  content:'';
+  position:absolute;bottom:-100px;right:0;
+  width:400px;height:400px;
+  background: radial-gradient(circle, rgba(255,107,53,0.04) 0%, transparent 65%);
+  pointer-events:none;
+}
+
+.hero-eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hero-eyebrow::before {
+  content:'';
+  display:inline-block;
+  width:32px;height:1px;background:var(--accent);
+}
+
+h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(52px, 8vw, 110px);
+  line-height: 0.9;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  margin-bottom: 24px;
+}
+
+h1 .accent { color: var(--accent); }
+
+.hero-sub {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 15px;
+  color: var(--muted);
+  max-width: 600px;
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 48px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px;
+  color: var(--text);
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* DISCLAIMER */
+.disclaimer {
+  background: rgba(255,204,2,0.06);
+  border: 1px solid rgba(255,204,2,0.2);
+  border-left: 3px solid var(--warn);
+  margin: 24px 48px;
+  padding: 14px 18px;
+  font-size: 11px;
+  color: #c9a200;
+  line-height: 1.7;
+}
+
+/* CONTROLS */
+.controls {
+  padding: 24px 48px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--surface);
+  position: sticky;
+  top: 64px;
+  z-index: 90;
+}
+
+.search-wrap {
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  left: 16px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+#searchInput {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  padding: 12px 16px 12px 44px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+#searchInput:focus { border-color: var(--accent); }
+#searchInput::placeholder { color: var(--muted); }
+
+.filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-label {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-right: 4px;
+}
+
+.filter-btn {
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+.filter-btn.active { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+
+.results-count {
+  font-size: 11px;
+  color: var(--muted);
+  padding: 8px 48px 0;
+}
+
+.results-count span { color: var(--accent); }
+
+/* GRID */
+.peptide-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(520px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  margin: 1px 0;
+}
+
+/* CARD */
+.peptide-card {
+  background: var(--surface);
+  padding: 28px 28px 24px;
+  transition: background 0.2s;
+  position: relative;
+  animation: fadeIn 0.3s ease both;
+}
+
+@keyframes fadeIn {
+  from { opacity:0; transform: translateY(8px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+
+.peptide-card:hover { background: var(--surface2); }
+
+.peptide-card.hidden { display: none; }
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  gap: 12px;
+}
+
+.card-left { flex: 1; }
+
+.card-nr {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.card-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 0.05em;
+  color: var(--text);
+  line-height: 1;
+  margin-bottom: 3px;
+}
+
+.card-aka {
+  font-size: 10px;
+  color: var(--muted);
+  font-style: italic;
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+
+.card-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.cat-tag {
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border: 1px solid;
+  font-family: 'IBM Plex Mono', monospace;
+  white-space: nowrap;
+}
+
+.route-tag {
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  white-space: nowrap;
+}
+
+.route-inject { background: rgba(0,229,255,0.08); color: var(--accent); border: 1px solid rgba(0,229,255,0.2); }
+.route-oral   { background: rgba(127,255,107,0.08); color: var(--accent3); border: 1px solid rgba(127,255,107,0.2); }
+.route-nasal  { background: rgba(196,107,255,0.08); color: var(--accent4); border: 1px solid rgba(196,107,255,0.2); }
+.route-topisch{ background: rgba(255,107,53,0.08); color: var(--accent2); border: 1px solid rgba(255,107,53,0.2); }
+
+.risk-tag {
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+}
+.risk-low  { background: rgba(61,220,132,0.1);  color: var(--green); border: 1px solid rgba(61,220,132,0.2); }
+.risk-med  { background: rgba(255,204,2,0.08);  color: var(--warn);  border: 1px solid rgba(255,204,2,0.2); }
+.risk-high { background: rgba(255,68,85,0.08);  color: var(--red);   border: 1px solid rgba(255,68,85,0.2); }
+
+/* TABS */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 8px 16px 7px;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: -1px;
+}
+
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* SECTION HEADINGS */
+.s-label {
+  font-size: 8px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.s-label::after {
+  content:'';flex:1;height:1px;background:var(--border);
+}
+
+ul.effect-list, ul.side-list, ul.note-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+ul.effect-list li { color: #88d8a0; font-size: 11.5px; padding-left: 14px; position:relative; }
+ul.effect-list li::before { content:'＋'; position:absolute;left:0;color:var(--green);font-size:9px;top:2px; }
+
+ul.side-list li { color: #d88888; font-size: 11.5px; padding-left: 14px; position:relative; }
+ul.side-list li::before { content:'－'; position:absolute;left:0;color:var(--red);font-size:9px;top:2px; }
+
+ul.note-list li { color: #c8c0a0; font-size: 11.5px; padding-left: 14px; position:relative; }
+ul.note-list li::before { content:'◦'; position:absolute;left:0;color:var(--warn);top:2px; }
+
+/* DOSAGE BOX */
+.dose-box {
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  padding: 14px 16px;
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.dose-item { display: flex; flex-direction: column; gap: 2px; }
+.dose-key { font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+.dose-val { font-size: 12px; color: var(--accent); font-weight: 600; }
+
+/* PRICE BOX */
+.price-box {
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-left: 2px solid var(--accent2);
+  padding: 12px 16px;
+  margin-top: 12px;
+}
+
+.price-title {
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+}
+
+.price-row:last-child { border-bottom: none; }
+.price-shop { color: var(--muted); }
+.price-amount { color: var(--accent2); font-weight: 600; }
+.price-amount.sale { color: var(--green); }
+
+/* STUDY BOX */
+.study-box {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.study-item {
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-left: 2px solid var(--accent4);
+  padding: 10px 14px;
+}
+
+.study-level {
+  display: inline-block;
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 1px 7px;
+  margin-bottom: 5px;
+}
+
+.study-human    { background: rgba(61,220,132,0.12); color: var(--green); }
+.study-pilot    { background: rgba(255,204,2,0.1); color: var(--warn); }
+.study-animal   { background: rgba(255,68,85,0.1); color: var(--red); }
+.study-invitro  { background: rgba(196,107,255,0.1); color: var(--accent4); }
+
+.study-text { font-size: 11px; color: var(--muted); line-height: 1.55; font-family: 'IBM Plex Sans', sans-serif; }
+
+/* FOOTER */
+footer {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 24px 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+
+.footer-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+}
+
+@media(max-width:700px){
+  header,.hero,.disclaimer,.controls,.results-count,footer{padding-left:16px;padding-right:16px;}
+  .peptide-grid{grid-template-columns:1fr;}
+  h1{font-size:52px;}
+  .hero-stats{gap:24px;}
+  .dose-box{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="#">Peptid<span>Base</span></a>
+  <div class="header-badge">Forschungs-Referenz 2025</div>
+</header>
+
+<section class="hero">
+  <div class="hero-eyebrow">Vollständige Peptid-Datenbank</div>
+  <h1>PEPTID<br><span class="accent">REFERENZ</span></h1>
+  <p class="hero-sub">Alle relevanten Peptide mit Wirkung, Nebenwirkungen, Dosierung, Einnahmehinweisen, Studienlage und aktuellen Marktpreisen aus deutschen Anbieter-Shops.</p>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-val">47</div><div class="stat-label">Peptide</div></div>
+    <div class="stat"><div class="stat-val">5</div><div class="stat-label">Quellen</div></div>
+    <div class="stat"><div class="stat-val">8</div><div class="stat-label">Kategorien</div></div>
+    <div class="stat"><div class="stat-val">⚕</div><div class="stat-label">Nur Info</div></div>
+  </div>
+</section>
+
+<div class="disclaimer">
+  ⚠ <strong>Wichtiger Hinweis:</strong> Diese Datenbank dient ausschließlich zu Informations- und Forschungszwecken. Die aufgeführten Substanzen sind in Deutschland und der EU überwiegend <strong>nicht für den Humangebrauch zugelassen</strong>. Selbstmedikation ist gefährlich und illegal. Konsultiere immer einen Arzt. Alle Preisangaben stammen von externen Anbietern und können sich ändern.
+</div>
+
+<div class="controls">
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="searchInput" placeholder="Peptid suchen… z.B. BPC-157, Semaglutid, Schlaf, Regeneration…" oninput="filterPeptides()">
+  </div>
+  <div class="filters">
+    <span class="filter-label">Kategorie:</span>
+    <button class="filter-btn active" onclick="setFilter('all',this)">Alle</button>
+    <button class="filter-btn" onclick="setFilter('heilung',this)">Heilung</button>
+    <button class="filter-btn" onclick="setFilter('wachstum',this)">Wachstumshormon</button>
+    <button class="filter-btn" onclick="setFilter('gewicht',this)">Gewicht</button>
+    <button class="filter-btn" onclick="setFilter('libido',this)">Libido</button>
+    <button class="filter-btn" onclick="setFilter('aging',this)">Anti-Aging</button>
+    <button class="filter-btn" onclick="setFilter('neuro',this)">Neuro/Schlaf</button>
+    <button class="filter-btn" onclick="setFilter('kosmetik',this)">Kosmetik</button>
+    <button class="filter-btn" onclick="setFilter('stack',this)">Stacks</button>
+    <span class="filter-label" style="margin-left:16px">Risiko:</span>
+    <button class="filter-btn" onclick="setRisk('all',this)">Alle</button>
+    <button class="filter-btn" onclick="setRisk('low',this)">Niedrig</button>
+    <button class="filter-btn" onclick="setRisk('med',this)">Mittel</button>
+    <button class="filter-btn" onclick="setRisk('high',this)">Hoch</button>
+  </div>
+</div>
+
+<div class="results-count" id="resultsCount"><span id="countNum">47</span> Peptide gefunden</div>
+
+<div class="peptide-grid" id="peptideGrid">
+
+<!-- ===== CARD TEMPLATE =====
+data-cat  = heilung | wachstum | gewicht | libido | aging | neuro | kosmetik
+data-risk = low | med | high
+data-search = lowercase searchable text
+-->
+
+<!-- 01 BPC-157 -->
+<div class="peptide-card" data-cat="heilung" data-risk="low" data-search="bpc-157 body protection compound heilung regeneration sehnen magen">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">01 / 28 · HEILUNG & REGENERATION</div>
+      <div class="card-name">BPC-157</div>
+      <div class="card-aka">Body Protection Compound-157</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#3ddc84;border-color:#3ddc84">Heilung</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="route-tag route-oral">💊 Oral möglich</span>
+      <span class="risk-tag risk-low">Risiko: Niedrig</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t01-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t01-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t01-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t01-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t01-price')">Preise</button>
+  </div>
+  <div id="t01-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Beschleunigt Heilung von Sehnen, Bändern & Muskeln</li>
+      <li>Schützt & regeneriert die Magenschleimhaut (Ulzera, Leaky Gut)</li>
+      <li>Stark entzündungshemmend ohne Immunsuppression</li>
+      <li>Fördert Angiogenese (neue Blutgefäße)</li>
+      <li>Neuroprotektive & antidepressive Eigenschaften</li>
+      <li>Kann Blutdruck regulieren (bidirektional)</li>
+      <li>Schützt Leber vor toxischen Schäden</li>
+    </ul>
+    <div class="s-label">Einnahmehinweise</div>
+    <ul class="note-list">
+      <li>Nüchtern oder nach dem Essen – beide Wege funktionieren</li>
+      <li>Oral wirksam für Magenprobleme, subkutan für systemische Wirkung</li>
+      <li>Injektionsstelle nahe am Verletzungsbereich wählen</li>
+      <li>Keine bekannten Interaktionen mit Nahrungsmitteln</li>
+    </ul>
+  </div>
+  <div id="t01-side" class="tab-content">
+    <ul class="side-list">
+      <li>Schwindel bei hoher Dosierung möglich</li>
+      <li>Leichte Übelkeit, besonders zu Beginn</li>
+      <li>Theoretisches Tumorwachstumsrisiko (bisher nicht belegt)</li>
+      <li>Sehr wenige kontrollierte Humanstudien</li>
+    </ul>
+  </div>
+  <div id="t01-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Typische Dosis</div><div class="dose-val">200–500 mcg/Tag</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendungsweg</div><div class="dose-val">Subkutan / Oral</div></div>
+      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">4–12 Wochen</div></div>
+      <div class="dose-item"><div class="dose-key">Timing</div><div class="dose-val">Morgens nüchtern</div></div>
+    </div>
+    <div class="s-label">Empfehlung Injektion vs. Oral</div>
+    <ul class="note-list">
+      <li><strong style="color:var(--accent)">Injektion empfohlen</strong> für systemische Wirkung & Verletzungsheilung</li>
+      <li>Oral wirksam bei Magen-Darm-Problemen (lokale Wirkung)</li>
+    </ul>
+  </div>
+  <div id="t01-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-animal">Tierversuch</span>
+        <p class="study-text">Zahlreiche Ratten-/Mäusestudien belegen Heilungsbeschleunigung von Sehnen, Magen & Muskeln. Stabiles Wirkprofil in multiplen Labormodellen seit 1990er Jahren.</p>
+      </div>
+      <div class="study-item">
+        <span class="study-level study-pilot">Pilot / Anekdotisch</span>
+        <p class="study-text">Breite Anwenderdokumentation bei Sportlern & Biohackern. Klinische Humanstudien fehlen bisher offiziell, Sicherheitsprofil gilt jedoch als gut.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t01-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise (Stand 2025)</div>
+      <div class="price-row"><span class="price-shop">Peptid24 (5mg)</span><span class="price-amount sale">€24,90 <small style="color:var(--muted);text-decoration:line-through">€32,90</small></span></div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide (10mg)</span><span class="price-amount">€32,90</span></div>
+      <div class="price-row"><span class="price-shop">Europa-Peptide (Bundle +TB500)</span><span class="price-amount">€129,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 02 TB-500 -->
+<div class="peptide-card" data-cat="heilung" data-risk="low" data-search="tb-500 thymosin beta-4 heilung verletzung entzündung">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">02 / 28 · HEILUNG & REGENERATION</div>
+      <div class="card-name">TB-500</div>
+      <div class="card-aka">Thymosin Beta-4</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#3ddc84;border-color:#3ddc84">Heilung</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="risk-tag risk-low">Risiko: Niedrig</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t02-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t02-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t02-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t02-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t02-price')">Preise</button>
+  </div>
+  <div id="t02-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Schnelle Heilung von Muskeln, Sehnen & Bändern</li>
+      <li>Fördert Angiogenese (neue Blutgefäßneubildung)</li>
+      <li>Verbessert Gewebeflexibilität & Mobilität</li>
+      <li>Entzündungsregulation ohne vollständige Hemmung</li>
+      <li>Kann Haarwachstum fördern</li>
+      <li>Synergistisch mit BPC-157 (Stack-Effekt)</li>
+    </ul>
+    <div class="s-label">Einnahmehinweise</div>
+    <ul class="note-list">
+      <li>Wird häufig mit BPC-157 gestacked (KLOW/GLOW-Stack)</li>
+      <li>Ladeprotokoll: erste 4 Wochen höher dosiert, dann Erhaltungsdosis</li>
+      <li>Kühl und lichtgeschützt lagern (lyophilisiert)</li>
+    </ul>
+  </div>
+  <div id="t02-side" class="tab-content">
+    <ul class="side-list">
+      <li>Kopfschmerzen nach Injektion möglich</li>
+      <li>Müdigkeit & leichte Erschöpfung</li>
+      <li>Leichte Übelkeit</li>
+      <li>Krebsfördernde Wirkung theoretisch diskutiert (unbewiesen)</li>
+    </ul>
+  </div>
+  <div id="t02-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Ladephase</div><div class="dose-val">4–5 mg/Woche</div></div>
+      <div class="dose-item"><div class="dose-key">Erhaltung</div><div class="dose-val">2–2,5 mg/Woche</div></div>
+      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">4–8 Wochen</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan</div></div>
+    </div>
+    <div class="s-label">Empfehlung</div>
+    <ul class="note-list">
+      <li><strong style="color:var(--accent)">Injektion notwendig</strong> – orale Bioverfügbarkeit sehr gering</li>
+    </ul>
+  </div>
+  <div id="t02-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-animal">Tierversuch</span>
+        <p class="study-text">Gut belegte Heilungsförderung in Tiermodellen. Herzmuskel-Regeneration nach Infarkt besonders gut dokumentiert (Murine Studien).</p>
+      </div>
+      <div class="study-item">
+        <span class="study-level study-pilot">Pilot</span>
+        <p class="study-text">Sportmedizinische Anwenderberichte konsistent positiv. Keine publizierten RCTs am Menschen bisher.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t02-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide (10mg)</span><span class="price-amount">€34,90</span></div>
+      <div class="price-row"><span class="price-shop">Europa-Peptide (Bundle BPC+TB)</span><span class="price-amount">€129,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 03 Ipamorelin -->
+<div class="peptide-card" data-cat="wachstum" data-risk="low" data-search="ipamorelin wachstumshormon gh-sekretagogum muskelaufbau schlaf anti-aging">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">03 / 28 · WACHSTUMSHORMON</div>
+      <div class="card-name">Ipamorelin</div>
+      <div class="card-aka">GH-Sekretagogum · Pentapeptid</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#00e5ff;border-color:#00e5ff">Wachstumshormon</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="risk-tag risk-low">Risiko: Niedrig</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t03-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t03-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t03-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t03-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t03-price')">Preise</button>
+  </div>
+  <div id="t03-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Selektive GH-Freisetzung ohne Cortisol-/Prolaktinerhöhung</li>
+      <li>Fördert Muskelaufbau & Fettabbau</li>
+      <li>Verbessert Schlaftiefe (besonders Tiefschlaf)</li>
+      <li>Anti-Aging auf Haut, Knochen & Gelenke</li>
+      <li>Verbessert Regeneration nach Training</li>
+      <li>Milder GH-Puls – physiologisch & sicher</li>
+    </ul>
+    <div class="s-label">Einnahmehinweise</div>
+    <ul class="note-list">
+      <li>Nüchtern nehmen (mind. 2h nach letzter Mahlzeit)</li>
+      <li>Insulin & erhöhter Blutzucker hemmen GH-Freisetzung</li>
+      <li>Abends vor dem Schlafen für maximalen GH-Puls</li>
+      <li>Häufig mit CJC-1295 kombiniert (synergistisch)</li>
+    </ul>
+  </div>
+  <div id="t03-side" class="tab-content">
+    <ul class="side-list">
+      <li>Wassereinlagerungen (mild)</li>
+      <li>Kopfschmerzen, besonders anfangs</li>
+      <li>Kribbeln/Taubheit in Extremitäten</li>
+      <li>Erhöhter Appetit</li>
+      <li>Bei sehr hohen Dosen: Insulinresistenz möglich</li>
+    </ul>
+  </div>
+  <div id="t03-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Standarddosis</div><div class="dose-val">200–300 mcg</div></div>
+      <div class="dose-item"><div class="dose-key">Frequenz</div><div class="dose-val">1–3×/Tag</div></div>
+      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">8–12 Wochen</div></div>
+      <div class="dose-item"><div class="dose-key">Timing</div><div class="dose-val">Nüchtern, abends</div></div>
+    </div>
+    <div class="s-label">Empfehlung</div>
+    <ul class="note-list">
+      <li><strong style="color:var(--accent)">Injektion empfohlen</strong> für volle Wirksamkeit</li>
+      <li>Oral kaum bioverfügbar durch Magenabbau</li>
+    </ul>
+  </div>
+  <div id="t03-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-human">Klinische Studie</span>
+        <p class="study-text">Mehrere Phase-II-Studien belegen sichere & effektive GH-Freisetzung. Kein Cortisol- oder Prolaktineffekt nachgewiesen – klarer Vorteil gegenüber GHRP-2/6.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t03-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Peptid24 (10mg)</span><span class="price-amount">€49,90</span></div>
+      <div class="price-row"><span class="price-shop">Peptid24 (Combo CJC+Ipa 10mg)</span><span class="price-amount">€55,00</span></div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide (CJC+Ipa 5+5mg)</span><span class="price-amount">€39,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 04 CJC-1295 -->
+<div class="peptide-card" data-cat="wachstum" data-risk="med" data-search="cjc-1295 wachstumshormon ghrh muskelaufbau fettabbau regeneration">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">04 / 28 · WACHSTUMSHORMON</div>
+      <div class="card-name">CJC-1295</div>
+      <div class="card-aka">Mod GRF(1-29) · GHRH-Analogon</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#00e5ff;border-color:#00e5ff">Wachstumshormon</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="risk-tag risk-med">Risiko: Mittel</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t04-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t04-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t04-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t04-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t04-price')">Preise</button>
+  </div>
+  <div id="t04-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Starke & lang anhaltende GH-Freisetzung (DAC-Version: Tage)</li>
+      <li>Synergistisch mit Ipamorelin – klassischer Goldstandard-Stack</li>
+      <li>Fördert Muskelwachstum & Körperkomposition</li>
+      <li>Knochenaufbauend & gelenkschützend</li>
+      <li>Verbessert Regeneration & Schlafqualität</li>
+    </ul>
+    <div class="s-label">Einnahmehinweise</div>
+    <ul class="note-list">
+      <li>Immer nüchtern injizieren (GH-Freisetzung durch Insulin gehemmt)</li>
+      <li>DAC-Version: 1×/Woche; Mod GRF(1-29): täglich</li>
+      <li>Kombination mit Ipamorelin gibt synergistischen GH-Puls</li>
+    </ul>
+  </div>
+  <div id="t04-side" class="tab-content">
+    <ul class="side-list">
+      <li>Wasserretention, besonders anfangs</li>
+      <li>Kribbeln/Taubheit in Händen & Füßen</li>
+      <li>Müdigkeit nach Injektion</li>
+      <li>Insulinresistenz bei Langzeitnutzung/Überdosierung</li>
+      <li>Erhöhter GH-Spiegel → Akromegalie-Risiko bei Missbrauch</li>
+    </ul>
+  </div>
+  <div id="t04-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Dosis (Mod GRF)</div><div class="dose-val">100–200 mcg/Tag</div></div>
+      <div class="dose-item"><div class="dose-key">Dosis (DAC)</div><div class="dose-val">1–2 mg/Woche</div></div>
+      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">8–16 Wochen</div></div>
+      <div class="dose-item"><div class="dose-key">Timing</div><div class="dose-val">Nüchtern, abends</div></div>
+    </div>
+  </div>
+  <div id="t04-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-human">Klinische Studie</span>
+        <p class="study-text">Humanstudien belegen dosisabhängige GH- & IGF-1-Erhöhung. DAC-Version zeigt Wochen-lange Wirkdauer. Gut toleriert in kontrollierten Settings.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t04-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Peptid24 (Kombo CJC+Ipa 10mg)</span><span class="price-amount">€55,00</span></div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide (5mg+5mg)</span><span class="price-amount">€39,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 05 Semaglutid -->
+<div class="peptide-card" data-cat="gewicht" data-risk="med" data-search="semaglutid glp-1 gewichtsverlust diabetes ozempic wegovy appetit">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">05 / 28 · GEWICHT & METABOLISMUS</div>
+      <div class="card-name">Semaglutid</div>
+      <div class="card-aka">GLP-1-Agonist · Ozempic / Wegovy</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#ff6b35;border-color:#ff6b35">Metabolismus</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="risk-tag risk-med">Risiko: Mittel</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t05-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t05-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t05-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t05-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t05-price')">Preise</button>
+  </div>
+  <div id="t05-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Stark appetitzügelnd (wirkt auf Hypothalamus)</li>
+      <li>Massiver Gewichtsverlust (15–25% des Körpergewichts)</li>
+      <li>Reguliert Blutzucker bei Typ-2-Diabetes</li>
+      <li>Kardiovaskulärer Schutz (Studien belegt)</li>
+      <li>Reduziert Verlangen nach Alkohol, Zucker & Nikotin</li>
+      <li>Verlangsamt Magenentleerung → längeres Sättigungsgefühl</li>
+    </ul>
+    <div class="s-label">Einnahmehinweise</div>
+    <ul class="note-list">
+      <li>Langsame Dosissteigerung reduziert Übelkeit erheblich</li>
+      <li>Proteinreiche Ernährung gegen Muskelverlust wichtig</li>
+      <li>Krafttraining parallel empfohlen</li>
+      <li>Wöchentlich gleichen Wochentag wählen</li>
+    </ul>
+  </div>
+  <div id="t05-side" class="tab-content">
+    <ul class="side-list">
+      <li>Übelkeit & Erbrechen (sehr häufig, besonders anfangs)</li>
+      <li>Durchfall oder Verstopfung</li>
+      <li>Magen-Darm-Beschwerden, Sodbrennen</li>
+      <li>Muskelverlust bei schnellem Gewichtsabfall ohne Sport</li>
+      <li>Schilddrüsen-C-Zell-Tumore (Tierversuch – klinische Relevanz unklar)</li>
+      <li>Pankreatitis-Risiko (selten aber schwerwiegend)</li>
+      <li>Gallenblasensteine</li>
+      <li>Jo-Jo-Effekt nach Absetzen sehr ausgeprägt</li>
+    </ul>
+  </div>
+  <div id="t05-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Startdosis</div><div class="dose-val">0,25 mg/Woche</div></div>
+      <div class="dose-item"><div class="dose-key">Maximaldosis</div><div class="dose-val">2,4 mg/Woche</div></div>
+      <div class="dose-item"><div class="dose-key">Steigerung</div><div class="dose-val">alle 4 Wochen</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan (Pen)</div></div>
+    </div>
+  </div>
+  <div id="t05-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-human">Klinische Studie (Phase III)</span>
+        <p class="study-text">STEP-Studienprogramm: ~15% Gewichtsverlust im Mittel bei Non-Diabetikern. SUSTAIN-Studien: kardiovaskulärer Schutz klar belegt. Stärkste Evidenz aller Peptide in dieser Datenbank.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t05-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise (Research-Peptide, kein Rx)</div>
+      <div class="price-row"><span class="price-shop">Peptid24 (div. Varianten)</span><span class="price-amount">€32,90–€209,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 06 Tirzepatid -->
+<div class="peptide-card" data-cat="gewicht" data-risk="med" data-search="tirzepatid gip glp-1 gewichtsverlust mounjaro diabetes metabolismus">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">06 / 28 · GEWICHT & METABOLISMUS</div>
+      <div class="card-name">Tirzepatid</div>
+      <div class="card-aka">GIP/GLP-1-Dualagonist · Mounjaro</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#ff6b35;border-color:#ff6b35">Metabolismus</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="risk-tag risk-med">Risiko: Mittel</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t06-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t06-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t06-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t06-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t06-price')">Preise</button>
+  </div>
+  <div id="t06-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Stärkster Gewichtsverlust aller zugelassenen Medikamente (bis 25%)</li>
+      <li>Doppelter Wirkmechanismus: GIP + GLP-1</li>
+      <li>Verbesserte Insulinsensitivität</li>
+      <li>Blutzuckerkontrolle bei Typ-2-Diabetes</li>
+      <li>Kardiovaskulärer Schutz</li>
+      <li>Lebergesundheit (NASH-Studien positiv)</li>
+    </ul>
+    <div class="s-label">Einnahmehinweise</div>
+    <ul class="note-list">
+      <li>Identische Vorsichtsmaßnahmen wie Semaglutid</li>
+      <li>Noch wichtiger: Proteinzufuhr & Krafttraining</li>
+      <li>Stärkere Übelkeit möglich als bei Semaglutid</li>
+    </ul>
+  </div>
+  <div id="t06-side" class="tab-content">
+    <ul class="side-list">
+      <li>Übelkeit, Erbrechen, Durchfall (häufig)</li>
+      <li>Magen-Darm-Beschwerden, Völlegefühl</li>
+      <li>Muskelverlust (trotz größerem Gesamtverlust)</li>
+      <li>Gallenblasenprobleme</li>
+      <li>Pankreatitis (selten)</li>
+      <li>Schilddrüsen-C-Zell-Tumore (Tierversuch)</li>
+    </ul>
+  </div>
+  <div id="t06-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Startdosis</div><div class="dose-val">2,5 mg/Woche</div></div>
+      <div class="dose-item"><div class="dose-key">Zieldosis</div><div class="dose-val">5–15 mg/Woche</div></div>
+      <div class="dose-item"><div class="dose-key">Steigerung</div><div class="dose-val">alle 4 Wochen</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan (Pen)</div></div>
+    </div>
+  </div>
+  <div id="t06-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-human">Phase III (SURMOUNT)</span>
+        <p class="study-text">SURMOUNT-1: ~22% Gewichtsreduktion in 72 Wochen. Stärkste je in einer Studie gemessene medikamentöse Gewichtsreduktion. FDA zugelassen für Diabetes & Adipositas.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t06-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Peptid24 (versch. Dosen)</span><span class="price-amount">€32,90–€119,90</span></div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide (15mg)</span><span class="price-amount">€39,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 07 Retatrutid -->
+<div class="peptide-card" data-cat="gewicht" data-risk="high" data-search="retatrutid triple agonist glp-1 gip glucagon gewichtsverlust">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">07 / 28 · GEWICHT & METABOLISMUS</div>
+      <div class="card-name">Retatrutid</div>
+      <div class="card-aka">Triple Agonist (GLP-1 / GIP / Glucagon)</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#ff6b35;border-color:#ff6b35">Metabolismus</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="risk-tag risk-high">Risiko: Hoch</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t07-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t07-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t07-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t07-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t07-price')">Preise</button>
+  </div>
+  <div id="t07-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Extremer Gewichtsverlust (bis 24% in Phase-II)</li>
+      <li>Dreifacher Wirkmechanismus: Appetit + Metabolismus + Fettabbau</li>
+      <li>Verbesserter Energieverbrauch durch Glucagon-Komponente</li>
+      <li>Glukosekontrolle & Insulinsensitivität</li>
+      <li>Noch in Entwicklung – hohes Potenzial</li>
+    </ul>
+    <div class="s-label">Wichtige Hinweise</div>
+    <ul class="note-list">
+      <li>Noch nicht zugelassen – nur Phase-II-Daten verfügbar</li>
+      <li>Sehr starke Nebenwirkungen möglich</li>
+      <li>Engmaschige ärztliche Überwachung absolut notwendig</li>
+    </ul>
+  </div>
+  <div id="t07-side" class="tab-content">
+    <ul class="side-list">
+      <li>Starke Übelkeit & Erbrechen</li>
+      <li>Erheblicher Muskelverlust</li>
+      <li>Herzfrequenzerhöhung (Glucagon-Effekt)</li>
+      <li>Gallenblasenkomplikationen</li>
+      <li>Pankreatitis</li>
+      <li>Keine Langzeitsicherheitsdaten</li>
+    </ul>
+  </div>
+  <div id="t07-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Forschungsdosis</div><div class="dose-val">0,5–12 mg/Woche</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan</div></div>
+      <div class="dose-item"><div class="dose-key">Status</div><div class="dose-val">Phase II/III</div></div>
+      <div class="dose-item"><div class="dose-key">Risiko</div><div class="dose-val">⚠ Sehr hoch</div></div>
+    </div>
+  </div>
+  <div id="t07-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-human">Phase II</span>
+        <p class="study-text">Phase-II-Ergebnisse 2023: ~24% Gewichtsverlust in 48 Wochen – bisher stärkster je gemessener Effekt. Phase III läuft. Kein zugelassenes Produkt.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t07-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise (Research)</div>
+      <div class="price-row"><span class="price-shop">Peptid24 (versch. Dosen)</span><span class="price-amount">€34,90–€209,90</span></div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide (10mg/20mg)</span><span class="price-amount">€49,90–€82,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 08 HGH / Somatropin -->
+<div class="peptide-card" data-cat="wachstum" data-risk="high" data-search="hgh somatropin wachstumshormon muskelaufbau fettabbau anti-aging">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">08 / 28 · WACHSTUMSHORMON</div>
+      <div class="card-name">HGH (Somatropin)</div>
+      <div class="card-aka">Human Growth Hormone · 10 IU</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#00e5ff;border-color:#00e5ff">Wachstumshormon</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="risk-tag risk-high">Risiko: Hoch</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t08-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t08-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t08-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t08-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t08-price')">Preise</button>
+  </div>
+  <div id="t08-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Starkes Muskelwachstum & Kraft</li>
+      <li>Massiver Fettabbau (besonders viszeral)</li>
+      <li>Hautqualität, Haardichte, Anti-Aging</li>
+      <li>Knochen- & Gelenkstärkung</li>
+      <li>Verbesserte Regeneration & Schlaf</li>
+      <li>Erhöht IGF-1 (downstream-Effekt)</li>
+    </ul>
+  </div>
+  <div id="t08-side" class="tab-content">
+    <ul class="side-list">
+      <li>Akromegalie bei Langzeitnutzung/Überdosierung</li>
+      <li>Insulinresistenz & Diabetes-Risiko</li>
+      <li>Carpal-Tunnel-Syndrom</li>
+      <li>Organvergrößerung (Herz, Leber)</li>
+      <li>Wassereinlagerungen</li>
+      <li>Hemmt eigene GH-Produktion (HPTA-Suppression)</li>
+      <li>Krebsrisiko bei Überdosierung</li>
+    </ul>
+  </div>
+  <div id="t08-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Anti-Aging</div><div class="dose-val">1–2 IU/Tag</div></div>
+      <div class="dose-item"><div class="dose-key">Bodybuilding</div><div class="dose-val">3–6 IU/Tag</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan / IM</div></div>
+      <div class="dose-item"><div class="dose-key">Timing</div><div class="dose-val">Morgens nüchtern</div></div>
+    </div>
+    <div class="s-label">Empfehlung</div>
+    <ul class="note-list">
+      <li><strong style="color:var(--red)">Nur unter ärztlicher Aufsicht</strong> – verschreibungspflichtig</li>
+      <li>Sicherere Alternative: GH-Sekretago goga (Ipamorelin, CJC-1295)</li>
+    </ul>
+  </div>
+  <div id="t08-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-human">Klinische Daten</span>
+        <p class="study-text">Gut dokumentiert für GH-Defizienz & Wachstumsstörungen. Anti-Aging-Studien: Verbesserung der Körperzusammensetzung belegt, aber Risiken bei gesunden Erwachsenen überwiegen oft Nutzen.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t08-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Peptid24 (10 IU)</span><span class="price-amount sale">€17,90 <small style="color:var(--muted);text-decoration:line-through">€25,90</small></span></div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide (10 IU)</span><span class="price-amount">€18,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 09 IGF-1 LR3 -->
+<div class="peptide-card" data-cat="wachstum" data-risk="high" data-search="igf-1 lr3 insulin-like growth factor muskelwachstum anabol">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">09 / 28 · WACHSTUMSHORMON</div>
+      <div class="card-name">IGF-1 LR3</div>
+      <div class="card-aka">Insulin-like Growth Factor-1 Long R3</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#00e5ff;border-color:#00e5ff">Wachstumshormon</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="risk-tag risk-high">Risiko: Hoch</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t09-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t09-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t09-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t09-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t09-price')">Preise</button>
+  </div>
+  <div id="t09-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Direkte Muskelzellproliferation & -hyperplasie</li>
+      <li>Aktiviert Satellitenzellen → neue Muskelfasern</li>
+      <li>Stark anabol & antikatabol</li>
+      <li>Erhöhte Stickstoffretention</li>
+      <li>Fettabbau & Körperkomposition</li>
+    </ul>
+  </div>
+  <div id="t09-side" class="tab-content">
+    <ul class="side-list">
+      <li>Hypoglykämie – gefährlicher Blutzuckerabfall</li>
+      <li>Organvergrößerung bei Missbrauch</li>
+      <li>Krebsfördernd (fördert allgemeines Zellwachstum)</li>
+      <li>Carpal-Tunnel-Syndrom</li>
+      <li>Wassereinlagerungen</li>
+    </ul>
+  </div>
+  <div id="t09-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Dosis</div><div class="dose-val">20–120 mcg/Tag</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan / IM</div></div>
+      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">Max. 4–6 Wochen</div></div>
+      <div class="dose-item"><div class="dose-key">Vorsicht</div><div class="dose-val">Blutzucker messen!</div></div>
+    </div>
+  </div>
+  <div id="t09-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-animal">Tierversuch / Zellkultur</span>
+        <p class="study-text">Muskelwachstum in Tiermodellen gut belegt. Direkte Humanstudien zu Performance-Zwecken fehlen. Medizinische Nutzung bei Wachstumsstörungen bekannt.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t09-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Peptid24 (1mg)</span><span class="price-amount sale">€44,90 <small style="color:var(--muted);text-decoration:line-through">€59,90</small></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 10 Tesamorelin -->
+<div class="peptide-card" data-cat="wachstum" data-risk="med" data-search="tesamorelin ghrh wachstumshormon bauchfett hiv-lipodystrophie">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">10 / 28 · WACHSTUMSHORMON</div>
+      <div class="card-name">Tesamorelin</div>
+      <div class="card-aka">GHRH-Analogon · Egrifta</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#00e5ff;border-color:#00e5ff">Wachstumshormon</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="risk-tag risk-med">Risiko: Mittel</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t10-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t10-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t10-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t10-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t10-price')">Preise</button>
+  </div>
+  <div id="t10-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Gezielter Abbau von viszeralem (Bauch-)Fett</li>
+      <li>GH-Freisetzung ohne direkte GH-Gabe</li>
+      <li>FDA-zugelassen für HIV-Lipodystrophie</li>
+      <li>Verbessert Körperzusammensetzung</li>
+      <li>Kognitive Verbesserungen (Alzheimer-Forschung)</li>
+    </ul>
+  </div>
+  <div id="t10-side" class="tab-content">
+    <ul class="side-list">
+      <li>Lokalreaktionen an Einstichstelle</li>
+      <li>Wassereinlagerungen</li>
+      <li>Muskelschmerzen, Gelenkschmerzen</li>
+      <li>Erhöhter Blutzucker</li>
+      <li>Kribbeln in Extremitäten</li>
+    </ul>
+  </div>
+  <div id="t10-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Dosis</div><div class="dose-val">1–2 mg/Tag</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan</div></div>
+      <div class="dose-item"><div class="dose-key">Timing</div><div class="dose-val">Abends, nüchtern</div></div>
+      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">6–12 Monate möglich</div></div>
+    </div>
+  </div>
+  <div id="t10-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-human">FDA-zugelassen</span>
+        <p class="study-text">Klinisch gut belegt für viszerale Fettreduktion bei HIV-Patienten. Alzheimer-Studien (Phase II) zeigen kognitive Verbesserungen – vielversprechend.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t10-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Peptid24 (10mg)</span><span class="price-amount sale">€49,90 <small style="color:var(--muted);text-decoration:line-through">€59,90</small></span></div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide (10mg)</span><span class="price-amount">€39,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 11 PT-141 -->
+<div class="peptide-card" data-cat="libido" data-risk="med" data-search="pt-141 bremelanotid libido sexualfunktion erektion lust">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">11 / 28 · LIBIDO & SEXUALFUNKTION</div>
+      <div class="card-name">PT-141</div>
+      <div class="card-aka">Bremelanotid · Vyleesi</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#c46bff;border-color:#c46bff">Libido</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="route-tag route-nasal">👃 Nasal</span>
+      <span class="risk-tag risk-med">Risiko: Mittel</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t11-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t11-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t11-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t11-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t11-price')">Preise</button>
+  </div>
+  <div id="t11-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Steigert sexuelles Verlangen bei Mann & Frau</li>
+      <li>Wirkt zentral (Gehirn), nicht vaskulär wie Viagra</li>
+      <li>Hilft bei erektiler Dysfunktion & HSDD</li>
+      <li>Wirkungseintritt nach ca. 1–2 Stunden</li>
+      <li>FDA-zugelassen (Vyleesi) für Frauen</li>
+    </ul>
+  </div>
+  <div id="t11-side" class="tab-content">
+    <ul class="side-list">
+      <li>Übelkeit (häufig, besonders nasal)</li>
+      <li>Flush / Gesichtsrötung</li>
+      <li>Blutdruckanstieg (vorübergehend)</li>
+      <li>Kopfschmerzen</li>
+      <li>Hyperpigmentierung bei häufiger Nutzung</li>
+    </ul>
+  </div>
+  <div id="t11-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Dosis</div><div class="dose-val">1–2 mg (Bedarf)</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan / Nasal</div></div>
+      <div class="dose-item"><div class="dose-key">Timing</div><div class="dose-val">1–2h vor Aktivität</div></div>
+      <div class="dose-item"><div class="dose-key">Frequenz</div><div class="dose-val">Max. 1×/72h</div></div>
+    </div>
+    <div class="s-label">Empfehlung</div>
+    <ul class="note-list">
+      <li>Subkutan → stärkere Wirkung, mehr Übelkeit möglich</li>
+      <li>Nasal → milder, schnellerer Eintritt</li>
+    </ul>
+  </div>
+  <div id="t11-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-human">FDA-zugelassen</span>
+        <p class="study-text">Klinisch belegt für hypoaktive Sexualstörung bei Frauen. Mehrere Phase-III-Studien erfolgreich. Für Männer off-label aber gut dokumentiert anekdotisch.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t11-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Europa-Peptide (10mg)</span><span class="price-amount">€34,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 12 Melanotan II -->
+<div class="peptide-card" data-cat="kosmetik" data-risk="high" data-search="melanotan mt-2 bräunung pigmentierung melanin libido">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">12 / 28 · KOSMETIK & PIGMENT</div>
+      <div class="card-name">Melanotan II</div>
+      <div class="card-aka">MT-2 · Alpha-MSH-Analogon</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#ff6b35;border-color:#ff6b35">Kosmetik</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="risk-tag risk-high">Risiko: Hoch</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t12-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t12-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t12-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t12-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t12-price')">Preise</button>
+  </div>
+  <div id="t12-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Stark erhöhte Melaninproduktion → intensive Bräunung</li>
+      <li>Potenzieller UV-Schutz durch mehr Melanin</li>
+      <li>Ausgeprägte libidosteigernde Wirkung</li>
+      <li>Appetitzügelnd</li>
+    </ul>
+  </div>
+  <div id="t12-side" class="tab-content">
+    <ul class="side-list">
+      <li>Starke Übelkeit anfangs (sehr häufig)</li>
+      <li>Spontane Erektionen (unkontrollierbar)</li>
+      <li>Veränderung von Muttermalen → Melanom-Risiko</li>
+      <li>Flush, Müdigkeit, Gesichtsrötung</li>
+      <li>Blutdruckveränderungen</li>
+      <li>In EU/DE nicht zugelassen</li>
+    </ul>
+  </div>
+  <div id="t12-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Aufbauphase</div><div class="dose-val">0,25–0,5 mg/Tag</div></div>
+      <div class="dose-item"><div class="dose-key">Erhaltung</div><div class="dose-val">0,5–1 mg 2–3×/Woche</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan</div></div>
+      <div class="dose-item"><div class="dose-key">Warnung</div><div class="dose-val">⚠ Haut beobachten</div></div>
+    </div>
+  </div>
+  <div id="t12-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-pilot">Pilot-Studien</span>
+        <p class="study-text">Bräunungseffekt in frühen Studien belegt. Entwicklung eingestellt aufgrund Sicherheitsbedenken. Kein Fortschritt zu Phase III. Melanom-Risiko durch Muttermalveränderungen klinisch besorgniserregend.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t12-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Peptid24 (10mg)</span><span class="price-amount">€29,90</span></div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide (10mg)</span><span class="price-amount">€32,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 13 GHK-Cu -->
+<div class="peptide-card" data-cat="kosmetik" data-risk="low" data-search="ghk-cu kupfer tripeptid haut kollagen haare anti-aging wundheilung">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">13 / 28 · KOSMETIK & ANTI-AGING</div>
+      <div class="card-name">GHK-Cu</div>
+      <div class="card-aka">Kupfer-Tripeptid-1 · Glycyl-His-Lys</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#ff6b35;border-color:#ff6b35">Kosmetik</span>
+      <span class="route-tag route-inject">💉 Subkutan</span>
+      <span class="route-tag route-topisch">🧴 Topisch</span>
+      <span class="risk-tag risk-low">Risiko: Niedrig</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t13-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t13-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t13-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t13-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t13-price')">Preise</button>
+  </div>
+  <div id="t13-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Fördert Kollagenproduktion & Elastin</li>
+      <li>Wundheilung & Gewebereparatur</li>
+      <li>Haarwachstum-fördernd (Miniaturisierung hemmen)</li>
+      <li>Antioxidative & entzündungshemmende Wirkung</li>
+      <li>Anti-Aging der Haut (topisch klinisch belegt)</li>
+      <li>Neuroprotektiv & genregulatorisch</li>
+    </ul>
+    <div class="s-label">Einnahmehinweise</div>
+    <ul class="note-list">
+      <li>Topisch: Abends nach Reinigung auftragen</li>
+      <li>Nicht mit starkem Vitamin C kombinieren (oxidiert Kupfer)</li>
+      <li>Subkutan für systemische anti-aging Effekte</li>
+    </ul>
+  </div>
+  <div id="t13-side" class="tab-content">
+    <ul class="side-list">
+      <li>Lokale Hautreizung (topisch, selten)</li>
+      <li>Kupfer-Überdosierung theoretisch bei extremem Missbrauch</li>
+      <li>Sehr sicheres Profil – kaum systemische Nebenwirkungen</li>
+    </ul>
+  </div>
+  <div id="t13-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Subkutan</div><div class="dose-val">1–2 mg/Tag</div></div>
+      <div class="dose-item"><div class="dose-key">Topisch</div><div class="dose-val">2% Creme, 2×tägl.</div></div>
+      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">Dauerhaft möglich</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Beide Wege gut</div></div>
+    </div>
+    <div class="s-label">Empfehlung</div>
+    <ul class="note-list">
+      <li>Topisch für Haut & Haare sehr gut belegt</li>
+      <li>Subkutan für systemische/interne Wirkungen</li>
+    </ul>
+  </div>
+  <div id="t13-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-human">Klinische Studien (Topisch)</span>
+        <p class="study-text">Mehrere kontrollierte Studien zu topischer Anwendung belegen Kollagenaufbau, Faltenreduktion & Haarwachstum. Eines der am besten erforschten Kosmetik-Peptide.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t13-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Peptid24 (50mg)</span><span class="price-amount sale">€29,90</span></div>
+      <div class="price-row"><span class="price-shop">Peptid24 (100mg)</span><span class="price-amount">€54,90</span></div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide (50/100mg)</span><span class="price-amount">€24,90–€38,90</span></div>
+      <div class="price-row"><span class="price-shop">Europa-Peptide (2% Creme 30ml)</span><span class="price-amount">€59,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 14 Epitalon -->
+<div class="peptide-card" data-cat="aging" data-risk="low" data-search="epitalon epithalon telomere anti-aging longevity melatonin schlaf">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">14 / 28 · ANTI-AGING & LONGEVITY</div>
+      <div class="card-name">Epitalon</div>
+      <div class="card-aka">Epithalone · Tetrapeptid Ala-Glu-Asp-Gly</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#7fff6b;border-color:#7fff6b">Anti-Aging</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="risk-tag risk-low">Risiko: Niedrig</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t14-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t14-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t14-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t14-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t14-price')">Preise</button>
+  </div>
+  <div id="t14-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Aktiviert Telomerase → verlängert Telomere</li>
+      <li>Anti-Aging auf Zellebene (epigenetisch)</li>
+      <li>Verbessert Schlaf & Melatoninproduktion</li>
+      <li>Antioxidative Wirkung</li>
+      <li>Immunmodulierend</li>
+      <li>Lebensverlängerung in Tierstudien belegt</li>
+    </ul>
+    <div class="s-label">Einnahmehinweise</div>
+    <ul class="note-list">
+      <li>Kurweise anwenden (10–20 Tage), dann Pause</li>
+      <li>1–2 Kuren pro Jahr bei Anti-Aging-Zweck</li>
+      <li>Abends injizieren für Schlafsynergie</li>
+    </ul>
+  </div>
+  <div id="t14-side" class="tab-content">
+    <ul class="side-list">
+      <li>Kaum bekannte Nebenwirkungen</li>
+      <li>Milde Einstichstellen-Reizung</li>
+      <li>Theoretisches Tumorrisiko durch Telomerase-Aktivierung</li>
+      <li>Langzeitdaten beim Menschen begrenzt</li>
+    </ul>
+  </div>
+  <div id="t14-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Dosis/Tag</div><div class="dose-val">5–10 mg</div></div>
+      <div class="dose-item"><div class="dose-key">Kursdauer</div><div class="dose-val">10–20 Tage</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan (abends)</div></div>
+      <div class="dose-item"><div class="dose-key">Frequenz</div><div class="dose-val">1–2×/Jahr</div></div>
+    </div>
+  </div>
+  <div id="t14-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-human">Russische Humanstudien</span>
+        <p class="study-text">Über 30 Jahre Forschung an russischen Instituten (Khavinson et al.). Verlängerte Lebenserwartung in mehreren Studien beobachtet. Westliche Replikation fehlt noch.</p>
+      </div>
+      <div class="study-item">
+        <span class="study-level study-animal">Tierversuch</span>
+        <p class="study-text">Lebensverlängerung in Fruchtfliegen & Ratten gut replizierbar. Telomerase-Aktivierung in vitro konsistent nachgewiesen.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t14-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide (10mg)</span><span class="price-amount">€29,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 15 Semax -->
+<div class="peptide-card" data-cat="neuro" data-risk="low" data-search="semax nootropikum gehirn konzentration gedächtnis bdnf neuroprotektiv">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">15 / 28 · NEURO & KOGNITION</div>
+      <div class="card-name">Semax</div>
+      <div class="card-aka">ACTH(4-7) Pro-Gly-Pro · russisches Nootrop</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#c46bff;border-color:#c46bff">Neuro</span>
+      <span class="route-tag route-nasal">👃 Nasal</span>
+      <span class="route-tag route-inject">💉 Subkutan</span>
+      <span class="risk-tag risk-low">Risiko: Niedrig</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t15-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t15-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t15-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t15-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t15-price')">Preise</button>
+  </div>
+  <div id="t15-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Kognitive Verbesserung (Fokus, Konzentration, Gedächtnis)</li>
+      <li>Erhöht BDNF (Gehirnwachstumsfaktor)</li>
+      <li>Neuroprotektiv nach Schlaganfall (klinisch belegt in Russland)</li>
+      <li>Stimmungsaufhellend & angstlösend</li>
+      <li>Energiefördernd ohne Jitteriness</li>
+    </ul>
+    <div class="s-label">Einnahmehinweise</div>
+    <ul class="note-list">
+      <li>Morgens anwenden (kann Schlaf stören bei Abendgabe)</li>
+      <li>Nasal: direkt in Nasenlöcher tropfen, einatmen</li>
+      <li>Kuren von 2–4 Wochen empfohlen</li>
+    </ul>
+  </div>
+  <div id="t15-side" class="tab-content">
+    <ul class="side-list">
+      <li>Schlafstörungen bei Abendanwendung</li>
+      <li>Leichte Nasenschleimhautreizung</li>
+      <li>Kopfschmerzen (selten)</li>
+      <li>Schwindel möglich</li>
+    </ul>
+  </div>
+  <div id="t15-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Dosis</div><div class="dose-val">300–600 mcg/Tag</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Nasal (bevorzugt)</div></div>
+      <div class="dose-item"><div class="dose-key">Timing</div><div class="dose-val">Morgens</div></div>
+      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">2–4 Wochen</div></div>
+    </div>
+  </div>
+  <div id="t15-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-human">Klinische Studien (Russland)</span>
+        <p class="study-text">Russisches Arzneimittel mit klinischer Zulassung. Gut belegte neuroprotektive Wirkung nach Schlaganfall. Kognitionsverbesserung in mehreren Humanstudien. Westliche Replikation ausständig.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t15-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Peptid24 (10mg)</span><span class="price-amount sale">€44,90 <small style="color:var(--muted);text-decoration:line-through">€54,90</small></span></div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide (10mg)</span><span class="price-amount">€29,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 16 Selank -->
+<div class="peptide-card" data-cat="neuro" data-risk="low" data-search="selank angst stress anxiolytisch immunsystem gedächtnis tuftsin">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">16 / 28 · NEURO & STRESS</div>
+      <div class="card-name">Selank</div>
+      <div class="card-aka">Tuftsin-Analogon · Heptapeptid</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#c46bff;border-color:#c46bff">Neuro</span>
+      <span class="route-tag route-nasal">👃 Nasal</span>
+      <span class="risk-tag risk-low">Risiko: Niedrig</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t16-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t16-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t16-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t16-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t16-price')">Preise</button>
+  </div>
+  <div id="t16-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Stark anxiolytisch ohne Sedierung (keine Benzodiazepin-Wirkung)</li>
+      <li>Verbessert Gedächtnis & Lernfähigkeit</li>
+      <li>Immunmodulierend</li>
+      <li>Antidepressiv wirkend</li>
+      <li>Kein Abhängigkeitspotenzial</li>
+    </ul>
+  </div>
+  <div id="t16-side" class="tab-content">
+    <ul class="side-list">
+      <li>Leichte Schläfrigkeit (möglich)</li>
+      <li>Schwindel bei Erstanwendung</li>
+      <li>Nasenschleimhautreizung</li>
+      <li>Langzeitdaten begrenzt</li>
+    </ul>
+  </div>
+  <div id="t16-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Dosis</div><div class="dose-val">250–3000 mcg/Tag</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Nasal</div></div>
+      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">2–4 Wochen</div></div>
+      <div class="dose-item"><div class="dose-key">Timing</div><div class="dose-val">Morgens / nach Bedarf</div></div>
+    </div>
+  </div>
+  <div id="t16-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-human">Klinische Studien (Russland)</span>
+        <p class="study-text">Russisches zugelassenes Arzneimittel. Angst & Stress-Reduktion klinisch belegt. Vergleichsstudien zu Benzodiazepinen zeigen äquivalente Wirkung ohne Abhängigkeit.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t16-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide (10mg)</span><span class="price-amount">€29,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 17 NAD+ -->
+<div class="peptide-card" data-cat="aging" data-risk="low" data-search="nad nicotinamid adenin dinukleotid energie anti-aging mitochondrien longevity">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">17 / 28 · ANTI-AGING & ENERGIE</div>
+      <div class="card-name">NAD+</div>
+      <div class="card-aka">Nicotinamid-Adenin-Dinukleotid</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#7fff6b;border-color:#7fff6b">Anti-Aging</span>
+      <span class="route-tag route-inject">💉 IV / Subkutan</span>
+      <span class="risk-tag risk-low">Risiko: Niedrig</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t17-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t17-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t17-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t17-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t17-price')">Preise</button>
+  </div>
+  <div id="t17-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Mitochondriale Energieproduktion</li>
+      <li>DNA-Reparatur-Aktivierung (Sirtuine, PARP)</li>
+      <li>Anti-Aging auf zellulärer Ebene</li>
+      <li>Verbesserte kognitive Funktion</li>
+      <li>Bessere Insulinsensitivität</li>
+      <li>Unterstützt Entzug (Alkohol, Drogen)</li>
+    </ul>
+  </div>
+  <div id="t17-side" class="tab-content">
+    <ul class="side-list">
+      <li>IV: Flush, Übelkeit bei zu schneller Infusion</li>
+      <li>Bauchkrämpfe möglich</li>
+      <li>Kopfschmerzen</li>
+      <li>Theoretisches Krebsrisiko (NAD fördert alle Zellen)</li>
+    </ul>
+  </div>
+  <div id="t17-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">IV-Infusion</div><div class="dose-val">250–1000 mg/Sitzung</div></div>
+      <div class="dose-item"><div class="dose-key">Subkutan</div><div class="dose-val">100–500 mg/Tag</div></div>
+      <div class="dose-item"><div class="dose-key">Oral (Vorstufen)</div><div class="dose-val">NMN/NR: 250–1000mg</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Morgens bevorzugt</div></div>
+    </div>
+    <div class="s-label">Empfehlung</div>
+    <ul class="note-list">
+      <li><strong style="color:var(--accent)">IV für stärkste Wirkung</strong> – subkutan guter Kompromiss</li>
+      <li>Oral: NMN/NR als Vorstufen gut bioverfügbar</li>
+    </ul>
+  </div>
+  <div id="t17-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-human">Klinische Studien</span>
+        <p class="study-text">Mehrere Phase-I/II-Studien zeigen sicheres Profil. NAD+-Spiegel steigen klar an. Effekte auf Muskelfunktion, Inflammation & Kognition in frühen Studien positiv.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t17-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide (500mg)</span><span class="price-amount">€64,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 18 MOTS-C -->
+<div class="peptide-card" data-cat="aging" data-risk="low" data-search="mots-c mitochondrien energie gewicht insulin metabolismus longevity">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">18 / 28 · ANTI-AGING & METABOLISMUS</div>
+      <div class="card-name">MOTS-C</div>
+      <div class="card-aka">Mitochondrial Open Reading Frame Peptide</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#7fff6b;border-color:#7fff6b">Anti-Aging</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="risk-tag risk-low">Risiko: Niedrig</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t18-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t18-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t18-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t18-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t18-price')">Preise</button>
+  </div>
+  <div id="t18-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Mitochondriale Funktion & Energiestoffwechsel</li>
+      <li>Verbessert Insulinsensitivität & Glukosemetabolismus</li>
+      <li>Fördert Fettabbau (AMPK-Aktivierung)</li>
+      <li>Anti-Aging auf Ebene der Mitochondrien</li>
+      <li>Physische Leistungsfähigkeit & Ausdauer</li>
+      <li>Entzündungshemmend</li>
+    </ul>
+  </div>
+  <div id="t18-side" class="tab-content">
+    <ul class="side-list">
+      <li>Kaum bekannte Nebenwirkungen</li>
+      <li>Sehr frühe Forschungsphase beim Menschen</li>
+      <li>Lokale Reizung möglich</li>
+    </ul>
+  </div>
+  <div id="t18-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Dosis</div><div class="dose-val">5–10 mg/Woche</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan</div></div>
+      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">8–12 Wochen</div></div>
+      <div class="dose-item"><div class="dose-key">Timing</div><div class="dose-val">Morgens</div></div>
+    </div>
+  </div>
+  <div id="t18-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-animal">Tierversuch</span>
+        <p class="study-text">Entdeckt 2015 (USC). Mäuse zeigten verbesserte Insulinsensitivität & Fettabbau. Lebensverlängerung in älteren Mäusen beobachtet. Humanstudien anlaufend.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t18-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Peptid24 (40mg)</span><span class="price-amount">€99,90</span></div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide (10mg)</span><span class="price-amount">€29,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 19 Thymosin Alpha-1 -->
+<div class="peptide-card" data-cat="aging" data-risk="low" data-search="thymosin alpha-1 immunsystem thymus infektion krebs immunmodulation">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">19 / 28 · IMMUNSYSTEM & ANTI-AGING</div>
+      <div class="card-name">Thymosin Alpha-1</div>
+      <div class="card-aka">Tα1 · Thymalfasin · Zadaxin</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#7fff6b;border-color:#7fff6b">Immunsystem</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="risk-tag risk-low">Risiko: Niedrig</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t19-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t19-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t19-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t19-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t19-price')">Preise</button>
+  </div>
+  <div id="t19-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Immunsystem-Booster & -Modulator</li>
+      <li>T-Zell-Aktivierung & -Reifung</li>
+      <li>Adjuvante Therapie bei Krebs & Infektionen</li>
+      <li>Hilft bei chronischen Virusinfektionen (HBV, HCV)</li>
+      <li>Anti-Aging des Immunsystems</li>
+      <li>Reduziert COVID-19-Schwere (Studien 2020–21)</li>
+    </ul>
+  </div>
+  <div id="t19-side" class="tab-content">
+    <ul class="side-list">
+      <li>Sehr sicheres Profil</li>
+      <li>Lokale Reaktionen an Einstichstelle</li>
+      <li>Autoimmun-Trigger bei Prädisposition möglich</li>
+    </ul>
+  </div>
+  <div id="t19-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Dosis</div><div class="dose-val">1,6 mg 2×/Woche</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan</div></div>
+      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">6–12 Wochen</div></div>
+      <div class="dose-item"><div class="dose-key">Indikation</div><div class="dose-val">Immunschwäche</div></div>
+    </div>
+  </div>
+  <div id="t19-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-human">Klinische Studien</span>
+        <p class="study-text">FDA-Orphan-Drug-Status. Gut belegte Wirkung bei Hepatitis B/C. COVID-19-Studien (2021) zeigten Reduktion schwerer Verläufe. In mehreren Ländern zugelassen (Zadaxin).</p>
+      </div>
+    </div>
+  </div>
+  <div id="t19-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide (10mg)</span><span class="price-amount">€39,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 20 5-Amino-1MQ -->
+<div class="peptide-card" data-cat="gewicht" data-risk="med" data-search="5-amino-1mq nnmt fettabbau metabolismus gewicht energie">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">20 / 28 · METABOLISMUS & GEWICHT</div>
+      <div class="card-name">5-Amino-1MQ</div>
+      <div class="card-aka">NNMT-Inhibitor · Oral aktiv</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#ff6b35;border-color:#ff6b35">Metabolismus</span>
+      <span class="route-tag route-oral">💊 Oral</span>
+      <span class="risk-tag risk-med">Risiko: Mittel</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t20-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t20-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t20-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t20-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t20-price')">Preise</button>
+  </div>
+  <div id="t20-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Hemmt NNMT → aktiviert Fettzellen-Stoffwechsel</li>
+      <li>Fettabbau ohne Kalorienreduktion (Tierstudien)</li>
+      <li>Erhöhte NAD+-Spiegel</li>
+      <li>Verbesserte Insulinsensitivität</li>
+      <li>Oral bioverfügbar – kein Injizieren nötig</li>
+    </ul>
+  </div>
+  <div id="t20-side" class="tab-content">
+    <ul class="side-list">
+      <li>Kaum Humanstudien – Sicherheitsprofil unklar</li>
+      <li>Magen-Darm-Beschwerden möglich</li>
+      <li>Langzeitwirkungen unbekannt</li>
+    </ul>
+  </div>
+  <div id="t20-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Dosis</div><div class="dose-val">5–50 mg/Tag</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Oral (Kapsel)</div></div>
+      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">4–8 Wochen</div></div>
+      <div class="dose-item"><div class="dose-key">Timing</div><div class="dose-val">Morgens mit Mahlzeit</div></div>
+    </div>
+    <div class="s-label">Empfehlung</div>
+    <ul class="note-list">
+      <li><strong style="color:var(--accent3)">Oral gut bioverfügbar</strong> – einer der wenigen oral aktiven Peptide</li>
+    </ul>
+  </div>
+  <div id="t20-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-animal">Tierversuch</span>
+        <p class="study-text">Mäuse zeigten signifikanten Fettabbau ohne Kalorienrestriktion. Mechanismus über NNMT-Hemmung gut verstanden. Humanstudien fehlen bisher.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t20-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide (5mg)</span><span class="price-amount">€34,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 21 SLU-PP-332 -->
+<div class="peptide-card" data-cat="gewicht" data-risk="med" data-search="slu-pp-332 ausdauer muskel sport leistung exercise mimetic">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">21 / 28 · PERFORMANCE & AUSDAUER</div>
+      <div class="card-name">SLU-PP-332</div>
+      <div class="card-aka">ERR-Agonist · Exercise Mimetic</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#ff6b35;border-color:#ff6b35">Performance</span>
+      <span class="route-tag route-oral">💊 Oral</span>
+      <span class="route-tag route-inject">💉 Subkutan</span>
+      <span class="risk-tag risk-med">Risiko: Mittel</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t21-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t21-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t21-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t21-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t21-price')">Preise</button>
+  </div>
+  <div id="t21-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Aktiviert ERR-Rezeptoren → simuliert Sport-Effekte</li>
+      <li>Erhöhte Mitochondrienzahl & Ausdauer</li>
+      <li>Fettabbau ohne Sport (in Tiermodellen)</li>
+      <li>Muskelfaser-Umwandlung zu Typ-1</li>
+      <li>Herz-Kreislauf-Gesundheit</li>
+    </ul>
+  </div>
+  <div id="t21-side" class="tab-content">
+    <ul class="side-list">
+      <li>Keine etablierten Humanstudien</li>
+      <li>Herzrhythmusstörungen theoretisch möglich</li>
+      <li>Langzeitwirkungen völlig unbekannt</li>
+    </ul>
+  </div>
+  <div id="t21-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Forschungsdosis</div><div class="dose-val">5–50 mg/Tag</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Oral / Subkutan</div></div>
+      <div class="dose-item"><div class="dose-key">Status</div><div class="dose-val">Frühe Forschung</div></div>
+      <div class="dose-item"><div class="dose-key">Risiko</div><div class="dose-val">⚠ Experimentell</div></div>
+    </div>
+  </div>
+  <div id="t21-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-animal">Tierversuch (2023)</span>
+        <p class="study-text">Mäuse liefen ohne Training deutlich länger & fitter. ERRα/γ-Aktivierung erhöht Mitochondriendichte. Aufsehenerregende Tierdaten, keine Humanstudien.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t21-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide (5mg)</span><span class="price-amount">€36,90</span></div>
+      <div class="price-row"><span class="price-shop">Europa-Peptide (300mcg × 100 Kaps.)</span><span class="price-amount sale">€79,90 <small style="color:var(--muted);text-decoration:line-through">€89,00</small></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 22 PE 22-28 -->
+<div class="peptide-card" data-cat="neuro" data-risk="low" data-search="pe 22-28 depression antidepressiv stimmung neuropeptid trkb">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">22 / 28 · NEURO & STIMMUNG</div>
+      <div class="card-name">PE 22-28</div>
+      <div class="card-aka">Spadin-Analogon · TrkB-Agonist</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#c46bff;border-color:#c46bff">Neuro</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="risk-tag risk-low">Risiko: Niedrig</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t22-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t22-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t22-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t22-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t22-price')">Preise</button>
+  </div>
+  <div id="t22-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Antidepressiver Effekt über BDNF/TrkB-Aktivierung</li>
+      <li>Schneller Wirkungseintritt (vs. klassische Antidepressiva)</li>
+      <li>Neurogenese-fördernd</li>
+      <li>Neuroprotektiv</li>
+      <li>Keine Gewöhnung / Abhängigkeit erwartet</li>
+    </ul>
+  </div>
+  <div id="t22-side" class="tab-content">
+    <ul class="side-list">
+      <li>Kaum bekannte Nebenwirkungen</li>
+      <li>Sehr frühe Forschungsphase</li>
+      <li>Langzeitwirkungen unbekannt</li>
+    </ul>
+  </div>
+  <div id="t22-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Forschungsdosis</div><div class="dose-val">1–5 mg/Tag</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan</div></div>
+      <div class="dose-item"><div class="dose-key">Status</div><div class="dose-val">Frühe Forschung</div></div>
+      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">4–8 Wochen</div></div>
+    </div>
+  </div>
+  <div id="t22-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-animal">Tierversuch</span>
+        <p class="study-text">Antidepressiver Effekt in Mäusemodellen mit schnellem Wirkungseintritt. TrkB-Agonismus gut beschrieben. Potenzielle Alternative zu klassischen Antidepressiva, Humanstudien ausständig.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t22-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Europa-Peptide (10mg)</span><span class="price-amount">€49,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 23 AICAR -->
+<div class="peptide-card" data-cat="gewicht" data-risk="med" data-search="aicar ampk ausdauer sport metabolismus fettabbau exercise mimetic">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">23 / 28 · PERFORMANCE & AUSDAUER</div>
+      <div class="card-name">AICAR</div>
+      <div class="card-aka">AMPK-Aktivator · Acadesine</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#ff6b35;border-color:#ff6b35">Performance</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="risk-tag risk-med">Risiko: Mittel</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t23-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t23-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t23-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t23-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t23-price')">Preise</button>
+  </div>
+  <div id="t23-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Aktiviert AMPK → Fettverbrennung & Ausdauer</li>
+      <li>Verbesserte aerobe Kapazität</li>
+      <li>Anti-Aging auf Zell- & Metabolismus-Ebene</li>
+      <li>Insulinsensitivierung</li>
+      <li>Herzschutz (kardiovaskuläre Studien)</li>
+    </ul>
+  </div>
+  <div id="t23-side" class="tab-content">
+    <ul class="side-list">
+      <li>Hypoglykämie möglich</li>
+      <li>Übelkeit</li>
+      <li>WADA-Doping-Liste (gesperrt im Sport)</li>
+      <li>Krebsfördernd bei vorbestehenden Tumoren theoretisch</li>
+    </ul>
+  </div>
+  <div id="t23-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Dosis</div><div class="dose-val">25–50 mg/Tag</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan</div></div>
+      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">4–8 Wochen</div></div>
+      <div class="dose-item"><div class="dose-key">Hinweis</div><div class="dose-val">⚠ WADA-gesperrt</div></div>
+    </div>
+  </div>
+  <div id="t23-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-human">Klinische Studien</span>
+        <p class="study-text">Mehrere Humanstudien zu Herzschutz, Insulinsensitivität & Ausdauer. AMPK-Aktivierung gut belegt. Klinisch genutzt bei Herzchirurgie. Ausdauereffekte in Nagetierstudien dramatisch.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t23-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Europa-Peptide (50mg)</span><span class="price-amount">€59,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 24 Sermorelin -->
+<div class="peptide-card" data-cat="wachstum" data-risk="low" data-search="sermorelin ghrh wachstumshormon anti-aging körperzusammensetzung schlaf">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">24 / 28 · WACHSTUMSHORMON</div>
+      <div class="card-name">Sermorelin</div>
+      <div class="card-aka">GHRH(1-29) · Geref</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#00e5ff;border-color:#00e5ff">Wachstumshormon</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="risk-tag risk-low">Risiko: Niedrig</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t24-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t24-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t24-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t24-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t24-price')">Preise</button>
+  </div>
+  <div id="t24-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Stimuliert natürliche GH-Produktion der Hypophyse</li>
+      <li>Verbessert Körperzusammensetzung (Fett ↓, Muskel ↑)</li>
+      <li>Fördert Schlaf & Energielevel</li>
+      <li>Knochenerhalt im Alter</li>
+      <li>Gilt als sicherer als direktes HGH</li>
+    </ul>
+  </div>
+  <div id="t24-side" class="tab-content">
+    <ul class="side-list">
+      <li>Rötung/Schmerz an Einstichstelle</li>
+      <li>Kopfschmerzen</li>
+      <li>Flush (Hitzegefühl)</li>
+      <li>Schwindel (selten)</li>
+      <li>Schluckbeschwerden (selten)</li>
+    </ul>
+  </div>
+  <div id="t24-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Dosis</div><div class="dose-val">200–500 mcg/Tag</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan (abends)</div></div>
+      <div class="dose-item"><div class="dose-key">Timing</div><div class="dose-val">Vor dem Schlafen</div></div>
+      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">3–6 Monate</div></div>
+    </div>
+  </div>
+  <div id="t24-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-human">Klinische Studien</span>
+        <p class="study-text">FDA-zugelassen als Diagnostikum & früher als GH-Ersatz. Gut toleriert in mehreren Studien. Weniger Nebenwirkungen als direktes HGH da physiologischer GH-Puls erhalten bleibt.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t24-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Kein aktueller Preis aus Quellen</span><span class="price-amount">—</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 25 GLOW Stack -->
+<div class="peptide-card" data-cat="heilung" data-risk="low" data-search="glow stack ghk-cu tb-500 bpc-157 heilung regeneration anti-aging haut">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">25 / 28 · STACK / KOMBINATION</div>
+      <div class="card-name">GLOW Stack</div>
+      <div class="card-aka">GHK-Cu + TB-500 + BPC-157 · 70mg</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#3ddc84;border-color:#3ddc84">Stack</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="risk-tag risk-low">Risiko: Niedrig</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t25-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t25-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t25-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t25-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t25-price')">Preise</button>
+  </div>
+  <div id="t25-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Synergistischer Anti-Aging Skin Stack</li>
+      <li>Kollagenaufbau (GHK-Cu) + Gewebeheilung (BPC-157) + Angiogenese (TB-500)</li>
+      <li>Ideal für Hautqualität, Narbenabbau & Anti-Aging</li>
+      <li>Kombination verstärkt jeden Einzeleffekt</li>
+      <li>Beliebt als Post-Sommer oder Anti-Aging-Kur</li>
+    </ul>
+  </div>
+  <div id="t25-side" class="tab-content">
+    <ul class="side-list">
+      <li>Addierte Nebenwirkungen der Einzelsubstanzen möglich</li>
+      <li>Mild – alle drei Komponenten haben gutes Sicherheitsprofil</li>
+    </ul>
+  </div>
+  <div id="t25-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">GHK-Cu</div><div class="dose-val">50 mg (im Stack)</div></div>
+      <div class="dose-item"><div class="dose-key">TB-500</div><div class="dose-val">10 mg (im Stack)</div></div>
+      <div class="dose-item"><div class="dose-key">BPC-157</div><div class="dose-val">10 mg (im Stack)</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan</div></div>
+    </div>
+  </div>
+  <div id="t25-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-pilot">Kombinations-Stack</span>
+        <p class="study-text">Kein direktes Stack-Studienprotokoll. Synergie basiert auf bekannten Wirkmechanismen der Einzelsubstanzen. Anwenderberichte konsistent positiv für Haut, Regeneration & Anti-Aging.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t25-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Peptid24 GLOW (70mg)</span><span class="price-amount sale">€129,90 <small style="color:var(--muted);text-decoration:line-through">€159,90</small></span></div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide GLOW Stack</span><span class="price-amount sale">€84,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 26 KLOW Stack -->
+<div class="peptide-card" data-cat="heilung" data-risk="low" data-search="klow stack ghk-cu tb-500 bpc-157 kpv heilung regeneration anti-aging">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">26 / 28 · STACK / KOMBINATION</div>
+      <div class="card-name">KLOW Stack</div>
+      <div class="card-aka">GHK-Cu + TB-500 + BPC-157 + KPV · 80mg</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#3ddc84;border-color:#3ddc84">Stack</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="risk-tag risk-low">Risiko: Niedrig</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t26-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t26-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t26-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t26-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t26-price')">Preise</button>
+  </div>
+  <div id="t26-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>GLOW Stack + KPV (anti-inflammatorisch)</li>
+      <li>KPV: stark entzündungshemmend, auch bei IBD (Darm)</li>
+      <li>Optimierter Stack für Entzündung & Regeneration</li>
+      <li>Ideal bei chronischen Entzündungen, Verletzungen & Hautproblemen</li>
+    </ul>
+  </div>
+  <div id="t26-side" class="tab-content">
+    <ul class="side-list">
+      <li>Sehr gutes Sicherheitsprofil aller Komponenten</li>
+      <li>Addierte milde Nebenwirkungen möglich</li>
+    </ul>
+  </div>
+  <div id="t26-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">GHK-Cu</div><div class="dose-val">50mg</div></div>
+      <div class="dose-item"><div class="dose-key">TB-500</div><div class="dose-val">10mg</div></div>
+      <div class="dose-item"><div class="dose-key">BPC-157</div><div class="dose-val">10mg</div></div>
+      <div class="dose-item"><div class="dose-key">KPV</div><div class="dose-val">10mg</div></div>
+    </div>
+  </div>
+  <div id="t26-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-pilot">Kombinations-Stack</span>
+        <p class="study-text">KPV (Lys-Pro-Val) als MSH-Analogon: Anti-inflammatorisch & darmschützend in mehreren Studien belegt. Gut dokumentiert für IBD & Hauterkrankungen.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t26-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide KLOW (80mg)</span><span class="price-amount">€94,90</span></div>
+      <div class="price-row"><span class="price-shop">Europa-Peptide KLOW (80mg)</span><span class="price-amount">€189,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 27 Melanotan I -->
+<div class="peptide-card" data-cat="kosmetik" data-risk="med" data-search="melanotan 1 mt-1 bräunung melanin afamelanotid haut">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">27 / 28 · KOSMETIK & PIGMENT</div>
+      <div class="card-name">Melanotan I</div>
+      <div class="card-aka">MT-1 · Afamelanotid</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#ff6b35;border-color:#ff6b35">Kosmetik</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="risk-tag risk-med">Risiko: Mittel</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t27-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t27-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t27-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t27-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t27-price')">Preise</button>
+  </div>
+  <div id="t27-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Bräunung durch Melaninerhöhung</li>
+      <li>UV-Schutz bei Lichtdermatosen (klinisch zugelassen in EU!)</li>
+      <li>Weniger Libidoeffekt als Melanotan II</li>
+      <li>In EU zugelassen für erythropoetische Protoporphyrie (Scenesse)</li>
+    </ul>
+  </div>
+  <div id="t27-side" class="tab-content">
+    <ul class="side-list">
+      <li>Übelkeit (milder als MT-2)</li>
+      <li>Flush</li>
+      <li>Müdigkeit</li>
+      <li>Veränderung bestehender Muttermale</li>
+    </ul>
+  </div>
+  <div id="t27-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Dosis</div><div class="dose-val">0,5–1 mg/Tag</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan</div></div>
+      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">Aufbauphase 2–4 Wo.</div></div>
+      <div class="dose-item"><div class="dose-key">Sicherheit</div><div class="dose-val">Besser als MT-2</div></div>
+    </div>
+  </div>
+  <div id="t27-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-human">EU-zugelassen (Scenesse)</span>
+        <p class="study-text">Afamelanotid (MT-1 Implantat) in EU zugelassen für erythropoetische Protoporphyrie. Bräunungseffekt klinisch belegt. Viel besseres Sicherheitsprofil als MT-2.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t27-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide (10mg)</span><span class="price-amount">€35,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 28 EPO -->
+<div class="peptide-card" data-cat="gewicht" data-risk="high" data-search="epo erythropoetin ausdauer rote blutkörperchen sport doping">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">28 / 28 · PERFORMANCE & AUSDAUER</div>
+      <div class="card-name">EPO</div>
+      <div class="card-aka">Erythropoetin · 3000 IU</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#ff4455;border-color:#ff4455">⚠ Hochrisiko</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="risk-tag risk-high">Risiko: Hoch</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t28-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t28-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t28-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t28-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t28-price')">Preise</button>
+  </div>
+  <div id="t28-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Erhöht Produktion roter Blutkörperchen</li>
+      <li>Massiv verbesserte Ausdauer & VO2max</li>
+      <li>Medizinisch: Anämietherapie (Nierenerkrankung, Chemo)</li>
+      <li>Im Sport: extremer Dopingeffekt</li>
+    </ul>
+  </div>
+  <div id="t28-side" class="tab-content">
+    <ul class="side-list">
+      <li>⚠ Thrombose- & Schlaganfallrisiko (erhöhte Blutviskosität)</li>
+      <li>⚠ Herzinfarkt (mehrere Todesfälle bei Sportlern belegt)</li>
+      <li>Hypertonie</li>
+      <li>Polyzythämie</li>
+      <li>Autoimmun-Aplasie (sehr selten)</li>
+      <li>WADA-gesperrt · verschreibungspflichtig</li>
+    </ul>
+  </div>
+  <div id="t28-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Medizinisch</div><div class="dose-val">50–300 IU/kg 3×/Woche</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan / IV</div></div>
+      <div class="dose-item"><div class="dose-key">Status</div><div class="dose-val">Verschreibungspflichtig</div></div>
+      <div class="dose-item"><div class="dose-key">Risiko</div><div class="dose-val">⚠⚠ LEBENSGEFAHR</div></div>
+    </div>
+  </div>
+  <div id="t28-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-human">Klinisch zugelassen</span>
+        <p class="study-text">Gut belegte medizinische Nutzung bei Anämie. Ausdauereffekt im Sport klar belegt. Todesfälle bei Radsportlern (1990er) durch Missbrauch dokumentiert. Nur unter strenger medizinischer Aufsicht.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t28-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Europa-Peptide (3000 IU)</span><span class="price-amount">€49,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 29 AOD-9604 --><div class="peptide-card" data-cat="gewicht" data-risk="low" data-search="aod-9604 fettabbau hgh fragment lipolyse gewicht metabolismus">  <div class="card-top">    <div class="card-left">      <div class="card-nr">29 / 42 · GEWICHT & METABOLISMUS</div>      <div class="card-name">AOD-9604</div>      <div class="card-aka">HGH-Fragment · Anti-Obesity Drug</div>    </div>    <div class="card-right">      <span class="cat-tag" style="color:#ff6b35;border-color:#ff6b35">Metabolismus</span>      <span class="route-tag route-inject">💉 Injizierbar</span>      <span class="risk-tag risk-low">Risiko: Niedrig</span>    </div>  </div>  <div class="tabs">    <button class="tab-btn active" onclick="switchTab(this,'t29-eff')">Wirkung</button>    <button class="tab-btn" onclick="switchTab(this,'t29-side')">Nebenwirkungen</button>    <button class="tab-btn" onclick="switchTab(this,'t29-dose')">Dosierung</button>    <button class="tab-btn" onclick="switchTab(this,'t29-study')">Studien</button>    <button class="tab-btn" onclick="switchTab(this,'t29-price')">Preise</button>  </div>  <div id="t29-eff" class="tab-content active">    <ul class="effect-list">      <li>Gezielter Fettabbau (lipolytisch) ohne GH-Nebenwirkungen</li>      <li>Hemmt Lipogenese (Fettaufbau)</li>      <li>Kein Einfluss auf Blutzucker oder Insulin</li>      <li>Knorpelreparatur (positive Arthrosis-Studien)</li>      <li>Gilt als eines der sichersten Fettabbaupeptide</li>    </ul>    <div class="s-label">Einnahmehinweise</div>    <ul class="note-list">      <li>Morgens nüchtern injizieren für maximale Lipolyse</li>      <li>Kein Essen 30 min vor und nach der Injektion</li>      <li>Kann mit Sport kombiniert werden</li>    </ul>  </div>  <div id="t29-side" class="tab-content">    <ul class="side-list">      <li>Leichte Rötung an der Einstichstelle</li>      <li>Kopfschmerzen (selten)</li>      <li>Übelkeit (selten)</li>      <li>Klinische Studien beim Menschen begrenzt</li>    </ul>  </div>  <div id="t29-dose" class="tab-content">    <div class="dose-box">      <div class="dose-item"><div class="dose-key">Dosis</div><div class="dose-val">300–500 mcg/Tag</div></div>      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan</div></div>      <div class="dose-item"><div class="dose-key">Timing</div><div class="dose-val">Morgens nüchtern</div></div>      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">8–12 Wochen</div></div>    </div>    <div class="s-label">Empfehlung</div>    <ul class="note-list"><li><strong style="color:var(--accent)">Injektion empfohlen</strong> – oral kaum bioverfügbar</li></ul>  </div>  <div id="t29-study" class="tab-content">    <div class="study-box">      <div class="study-item">        <span class="study-level study-human">Phase IIb (Australien)</span>        <p class="study-text">Klinische Studie bei übergewichtigen Patienten: signifikante Fettverlustrate ohne Blutzuckerveränderungen. FDA-Zulassung beantragt aber nicht erteilt. Gilt als sehr sicher.</p>      </div>    </div>  </div>  <div id="t29-price" class="tab-content">    <div class="price-box">      <div class="price-title">Aktuelle Marktpreise</div>      <div class="price-row"><span class="price-shop">Europa-Peptide (5mg)</span><span class="price-amount">€35,00</span></div>    </div>  </div></div><!-- 30 GHRP-6 --><div class="peptide-card" data-cat="wachstum" data-risk="med" data-search="ghrp-6 wachstumshormon appetit muskelaufbau gh-releaser">  <div class="card-top">    <div class="card-left">      <div class="card-nr">30 / 42 · WACHSTUMSHORMON</div>      <div class="card-name">GHRP-6</div>      <div class="card-aka">Growth Hormone Releasing Peptide-6</div>    </div>    <div class="card-right">      <span class="cat-tag" style="color:#00e5ff;border-color:#00e5ff">Wachstumshormon</span>      <span class="route-tag route-inject">💉 Injizierbar</span>      <span class="risk-tag risk-med">Risiko: Mittel</span>    </div>  </div>  <div class="tabs">    <button class="tab-btn active" onclick="switchTab(this,'t30-eff')">Wirkung</button>    <button class="tab-btn" onclick="switchTab(this,'t30-side')">Nebenwirkungen</button>    <button class="tab-btn" onclick="switchTab(this,'t30-dose')">Dosierung</button>    <button class="tab-btn" onclick="switchTab(this,'t30-study')">Studien</button>    <button class="tab-btn" onclick="switchTab(this,'t30-price')">Preise</button>  </div>  <div id="t30-eff" class="tab-content active">    <ul class="effect-list">      <li>Starke GH-Ausschüttung (hexapeptid)</li>      <li>Massiver Appetit-Anreiz (Ghrelin-ähnlich)</li>      <li>Muskelaufbau & Regeneration</li>      <li>Magengesundheit ähnlich BPC-157</li>      <li>Entzündungshemmend</li>      <li>Kann Herzschutzfunktion haben</li>    </ul>    <div class="s-label">Einnahmehinweise</div>    <ul class="note-list">      <li>Nüchtern injizieren (mind. 2h nach Mahlzeit)</li>      <li>Snack nach der Injektion bereithalten – Hunger sehr stark</li>      <li>Typisch 3× täglich: Morgens, nach Training, vor Schlaf</li>    </ul>  </div>  <div id="t30-side" class="tab-content">    <ul class="side-list">      <li>Extremer Hunger (Hauptproblem – sehr häufig)</li>      <li>Cortisol- & Prolaktinanstieg</li>      <li>Wassereinlagerungen</li>      <li>Kribbeln im Gesicht & Extremitäten</li>      <li>Schläfrigkeit nach Injektion</li>    </ul>  </div>  <div id="t30-dose" class="tab-content">    <div class="dose-box">      <div class="dose-item"><div class="dose-key">Dosis</div><div class="dose-val">100–300 mcg</div></div>      <div class="dose-item"><div class="dose-key">Frequenz</div><div class="dose-val">2–3×/Tag</div></div>      <div class="dose-item"><div class="dose-key">Timing</div><div class="dose-val">Nüchtern</div></div>      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan</div></div>    </div>  </div>  <div id="t30-study" class="tab-content">    <div class="study-box">      <div class="study-item">        <span class="study-level study-human">Klinische Studien</span>        <p class="study-text">Gut untersuchter GH-Releaser. Herz-Studien zeigen Schutzeffekte nach Ischämie. Cortisol-Anstieg klar belegt – Nachteil gegenüber Ipamorelin.</p>      </div>    </div>  </div>  <div id="t30-price" class="tab-content">    <div class="price-box">      <div class="price-title">Aktuelle Marktpreise</div>      <div class="price-row"><span class="price-shop">Europa-Peptide (5mg/10mg)</span><span class="price-amount">€28,90–€49,90</span></div>    </div>  </div></div><!-- 31 DSIP --><div class="peptide-card" data-cat="neuro" data-risk="low" data-search="dsip delta sleep schlaf tiefschlaf cortisol stress neuroprotektiv">  <div class="card-top">    <div class="card-left">      <div class="card-nr">31 / 42 · SCHLAF & NEURO</div>      <div class="card-name">DSIP</div>      <div class="card-aka">Delta Sleep-Inducing Peptide</div>    </div>    <div class="card-right">      <span class="cat-tag" style="color:#c46bff;border-color:#c46bff">Schlaf/Neuro</span>      <span class="route-tag route-inject">💉 Injizierbar</span>      <span class="risk-tag risk-low">Risiko: Niedrig</span>    </div>  </div>  <div class="tabs">    <button class="tab-btn active" onclick="switchTab(this,'t31-eff')">Wirkung</button>    <button class="tab-btn" onclick="switchTab(this,'t31-side')">Nebenwirkungen</button>    <button class="tab-btn" onclick="switchTab(this,'t31-dose')">Dosierung</button>    <button class="tab-btn" onclick="switchTab(this,'t31-study')">Studien</button>    <button class="tab-btn" onclick="switchTab(this,'t31-price')">Preise</button>  </div>  <div id="t31-eff" class="tab-content active">    <ul class="effect-list">      <li>Fördert Tiefschlaf (Delta-Wellen)</li>      <li>Reduziert Cortisol & Stressreaktion</li>      <li>Analgetische (schmerzlindernde) Wirkung</li>      <li>Antioxidativ & neuroprotektiv</li>      <li>Kann bei Entzugssymptomen helfen</li>      <li>Normalisiert gestörte Schlafarchitektur</li>    </ul>    <div class="s-label">Einnahmehinweise</div>    <ul class="note-list">      <li>Abends 30–60 min vor dem Schlafen</li>      <li>Nicht am Tag anwenden (Schläfrigkeit)</li>      <li>Kurzyklen von 2–4 Wochen empfohlen</li>    </ul>  </div>  <div id="t31-side" class="tab-content">    <ul class="side-list">      <li>Morgenmüdigkeit bei Überdosierung</li>      <li>Kopfschmerzen möglich</li>      <li>Kurzzeit-Blutdrucksenkung</li>      <li>Wenige Humanstudien</li>    </ul>  </div>  <div id="t31-dose" class="tab-content">    <div class="dose-box">      <div class="dose-item"><div class="dose-key">Dosis</div><div class="dose-val">100–500 mcg</div></div>      <div class="dose-item"><div class="dose-key">Timing</div><div class="dose-val">Abends vor Schlaf</div></div>      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan</div></div>      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">2–4 Wochen</div></div>    </div>  </div>  <div id="t31-study" class="tab-content">    <div class="study-box">      <div class="study-item">        <span class="study-level study-human">Pilot-Studien (1970er–80er)</span>        <p class="study-text">Erste Studien zeigten eindeutige Schlafförderung. Cortisol-senkende Wirkung konsistent. Moderne Replikation ausständig. Sicherheitsprofil gut.</p>      </div>    </div>  </div>  <div id="t31-price" class="tab-content">    <div class="price-box">      <div class="price-title">Aktuelle Marktpreise</div>      <div class="price-row"><span class="price-shop">Europa-Peptide (5mg/10mg)</span><span class="price-amount">€29,90–€54,90</span></div>    </div>  </div></div><!-- 32 KPV --><div class="peptide-card" data-cat="heilung" data-risk="low" data-search="kpv entzündung darm ibd anti-inflammatorisch alpha-msh hautpflege">  <div class="card-top">    <div class="card-left">      <div class="card-nr">32 / 42 · HEILUNG & ENTZÜNDUNG</div>      <div class="card-name">KPV</div>      <div class="card-aka">Lys-Pro-Val · α-MSH-Analogon</div>    </div>    <div class="card-right">      <span class="cat-tag" style="color:#3ddc84;border-color:#3ddc84">Heilung</span>      <span class="route-tag route-inject">💉 Injizierbar</span>      <span class="route-tag route-oral">💊 Oral (Darm)</span>      <span class="risk-tag risk-low">Risiko: Niedrig</span>    </div>  </div>  <div class="tabs">    <button class="tab-btn active" onclick="switchTab(this,'t32-eff')">Wirkung</button>    <button class="tab-btn" onclick="switchTab(this,'t32-side')">Nebenwirkungen</button>    <button class="tab-btn" onclick="switchTab(this,'t32-dose')">Dosierung</button>    <button class="tab-btn" onclick="switchTab(this,'t32-study')">Studien</button>    <button class="tab-btn" onclick="switchTab(this,'t32-price')">Preise</button>  </div>  <div id="t32-eff" class="tab-content active">    <ul class="effect-list">      <li>Stark entzündungshemmend (hemmt NF-κB)</li>      <li>Wirksam bei IBD (Morbus Crohn, Colitis ulcerosa)</li>      <li>Antibakteriell & antimikrobiell</li>      <li>Hautregeneration & Wundheilung</li>      <li>Darmschleimhaut-schützend</li>      <li>Synergistisch mit BPC-157 im KLOW-Stack</li>    </ul>    <div class="s-label">Einnahmehinweise</div>    <ul class="note-list">      <li>Oral für Darmprobleme direkt wirksam (lokale Wirkung)</li>      <li>Subkutan für systemische Entzündungshemmung</li>      <li>Mit BPC-157 kombinierbar</li>    </ul>  </div>  <div id="t32-side" class="tab-content">    <ul class="side-list">      <li>Sehr sicheres Profil</li>      <li>Kaum bekannte Nebenwirkungen</li>      <li>Milde lokale Reaktionen möglich</li>    </ul>  </div>  <div id="t32-dose" class="tab-content">    <div class="dose-box">      <div class="dose-item"><div class="dose-key">Dosis</div><div class="dose-val">500 mcg – 1 mg/Tag</div></div>      <div class="dose-item"><div class="dose-key">Oral (Darm)</div><div class="dose-val">0,5–2 mg/Tag</div></div>      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan / Oral</div></div>      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">4–8 Wochen</div></div>    </div>  </div>  <div id="t32-study" class="tab-content">    <div class="study-box">      <div class="study-item">        <span class="study-level study-animal">Tier- & Zellstudien</span>        <p class="study-text">Vielversprechende Daten bei Mausmodellen für IBD. NF-κB-Hemmung gut belegt. Klinische Humanstudien noch ausständig aber Sicherheitsprofil exzellent.</p>      </div>    </div>  </div>  <div id="t32-price" class="tab-content">    <div class="price-box">      <div class="price-title">Aktuelle Marktpreise</div>      <div class="price-row"><span class="price-shop">Europa-Peptide (10mg)</span><span class="price-amount">€62,90</span></div>    </div>  </div></div><!-- 33 HGH Fragment 176-191 --><div class="peptide-card" data-cat="gewicht" data-risk="low" data-search="hgh fragment 176-191 fettabbau lipolyse gewicht kein blutzucker">  <div class="card-top">    <div class="card-left">      <div class="card-nr">33 / 42 · GEWICHT & FETTABBAU</div>      <div class="card-name">Fragment 176-191</div>      <div class="card-aka">HGH-Frag · C-terminales HGH-Fragment</div>    </div>    <div class="card-right">      <span class="cat-tag" style="color:#ff6b35;border-color:#ff6b35">Metabolismus</span>      <span class="route-tag route-inject">💉 Injizierbar</span>      <span class="risk-tag risk-low">Risiko: Niedrig</span>    </div>  </div>  <div class="tabs">    <button class="tab-btn active" onclick="switchTab(this,'t33-eff')">Wirkung</button>    <button class="tab-btn" onclick="switchTab(this,'t33-side')">Nebenwirkungen</button>    <button class="tab-btn" onclick="switchTab(this,'t33-dose')">Dosierung</button>    <button class="tab-btn" onclick="switchTab(this,'t33-study')">Studien</button>    <button class="tab-btn" onclick="switchTab(this,'t33-price')">Preise</button>  </div>  <div id="t33-eff" class="tab-content active">    <ul class="effect-list">      <li>Gezielter Fettabbau – 12× stärker als HGH</li>      <li>Hemmt Lipogenese ohne Insulinwirkung</li>      <li>Kein Blutzuckereffekt (Vorteil ggü. HGH)</li>      <li>Kein Muskelabbau</li>      <li>Kann mit anderen GH-Peptiden kombiniert werden</li>    </ul>    <div class="s-label">Einnahmehinweise</div>    <ul class="note-list">      <li>Nüchtern 30–60 min vor dem Training</li>      <li>Kein Kohlenhydrat direkt nach Injektion</li>      <li>2× täglich für optimale Wirkung</li>    </ul>  </div>  <div id="t33-side" class="tab-content">    <ul class="side-list">      <li>Kopfschmerzen (selten)</li>      <li>Müdigkeit möglich</li>      <li>Schwindel</li>      <li>Begrenzte Langzeitdaten</li>    </ul>  </div>  <div id="t33-dose" class="tab-content">    <div class="dose-box">      <div class="dose-item"><div class="dose-key">Dosis</div><div class="dose-val">250–500 mcg</div></div>      <div class="dose-item"><div class="dose-key">Frequenz</div><div class="dose-val">1–2×/Tag</div></div>      <div class="dose-item"><div class="dose-key">Timing</div><div class="dose-val">Nüchtern, vor Training</div></div>      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan</div></div>    </div>  </div>  <div id="t33-study" class="tab-content">    <div class="study-box">      <div class="study-item">        <span class="study-level study-animal">Tier- & Phase-I-Studien</span>        <p class="study-text">Fettreduktion in Nagetierstudien klar belegt. Phase-I beim Menschen: sicheres Profil, kein Blutzuckereffekt. Weiterentwicklung als AOD-9604.</p>      </div>    </div>  </div>  <div id="t33-price" class="tab-content">    <div class="price-box">      <div class="price-title">Aktuelle Marktpreise</div>      <div class="price-row"><span class="price-shop">Europa-Peptide (10mg)</span><span class="price-amount">€94,90</span></div>    </div>  </div></div><!-- 34 Cagrilintid --><div class="peptide-card" data-cat="gewicht" data-risk="high" data-search="cagrilintid amylin gewichtsverlust cagrisema diabetes metabolismus">  <div class="card-top">    <div class="card-left">      <div class="card-nr">34 / 42 · GEWICHT & METABOLISMUS</div>      <div class="card-name">Cagrilintid</div>      <div class="card-aka">Amylin-Analogon · CagriSema (Kombi)</div>    </div>    <div class="card-right">      <span class="cat-tag" style="color:#ff6b35;border-color:#ff6b35">Metabolismus</span>      <span class="route-tag route-inject">💉 Injizierbar</span>      <span class="risk-tag risk-high">Risiko: Hoch</span>    </div>  </div>  <div class="tabs">    <button class="tab-btn active" onclick="switchTab(this,'t34-eff')">Wirkung</button>    <button class="tab-btn" onclick="switchTab(this,'t34-side')">Nebenwirkungen</button>    <button class="tab-btn" onclick="switchTab(this,'t34-dose')">Dosierung</button>    <button class="tab-btn" onclick="switchTab(this,'t34-study')">Studien</button>    <button class="tab-btn" onclick="switchTab(this,'t34-price')">Preise</button>  </div>  <div id="t34-eff" class="tab-content active">    <ul class="effect-list">      <li>Amylin-Analogon → reduziert Magenentleerung</li>      <li>Starke Sättigung & Appetitreduktion</li>      <li>Kombiniert mit Semaglutid (CagriSema): bis 25% Gewichtsverlust</li>      <li>Blutzuckerkontrolle</li>      <li>Nächste Generation nach Tirzepatid</li>    </ul>    <div class="s-label">Wichtige Hinweise</div>    <ul class="note-list">      <li>Noch in Phase-III – kein zugelassenes Produkt</li>      <li>Nur im Rahmen klinischer Studien oder Forschung</li>      <li>Sehr strenge ärztliche Aufsicht notwendig</li>    </ul>  </div>  <div id="t34-side" class="tab-content">    <ul class="side-list">      <li>Starke Übelkeit & Erbrechen</li>      <li>Magen-Darm-Beschwerden</li>      <li>Keine Langzeitsicherheitsdaten</li>      <li>Nicht für Selbstanwendung geeignet</li>    </ul>  </div>  <div id="t34-dose" class="tab-content">    <div class="dose-box">      <div class="dose-item"><div class="dose-key">Forschungsdosis</div><div class="dose-val">0,16–2,4 mg/Woche</div></div>      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan</div></div>      <div class="dose-item"><div class="dose-key">Status</div><div class="dose-val">Phase III (2024–25)</div></div>      <div class="dose-item"><div class="dose-key">Risiko</div><div class="dose-val">⚠ Experimentell</div></div>    </div>  </div>  <div id="t34-study" class="tab-content">    <div class="study-box">      <div class="study-item">        <span class="study-level study-human">Phase II/III</span>        <p class="study-text">SCALE-Studien mit CagriSema: ~25% Gewichtsreduktion. Kombinationsansatz revolutionär. Phase III läuft. Novo Nordisk Kandidat für nächste Adipositas-Zulassung.</p>      </div>    </div>  </div>  <div id="t34-price" class="tab-content">    <div class="price-box">      <div class="price-title">Aktuelle Marktpreise</div>      <div class="price-row"><span class="price-shop">Europa-Peptide (10mg)</span><span class="price-amount">€69,00</span></div>    </div>  </div></div><!-- 35 SNAP-8 --><div class="peptide-card" data-cat="kosmetik" data-risk="low" data-search="snap-8 botox alternative falten mimik anti-aging haut kosmetik">  <div class="card-top">    <div class="card-left">      <div class="card-nr">35 / 42 · KOSMETIK & ANTI-AGING</div>      <div class="card-name">SNAP-8</div>      <div class="card-aka">Leuphasyl · Acetyl Glutamyl Octapeptid-3</div>    </div>    <div class="card-right">      <span class="cat-tag" style="color:#ff6b35;border-color:#ff6b35">Kosmetik</span>      <span class="route-tag route-topisch">🧴 Topisch</span>      <span class="route-tag route-inject">💉 Mesotherapie</span>      <span class="risk-tag risk-low">Risiko: Niedrig</span>    </div>  </div>  <div class="tabs">    <button class="tab-btn active" onclick="switchTab(this,'t35-eff')">Wirkung</button>    <button class="tab-btn" onclick="switchTab(this,'t35-side')">Nebenwirkungen</button>    <button class="tab-btn" onclick="switchTab(this,'t35-dose')">Dosierung</button>    <button class="tab-btn" onclick="switchTab(this,'t35-study')">Studien</button>    <button class="tab-btn" onclick="switchTab(this,'t35-price')">Preise</button>  </div>  <div id="t35-eff" class="tab-content active">    <ul class="effect-list">      <li>Hemmt SNARE-Komplex → reduziert Mimikfalten</li>      <li>Alternative zu Botox (nicht invasiv)</li>      <li>Reduziert Faltentiefe bis 63% (Herstellerstudie)</li>      <li>Glättet Stirn, Augenpartie & Mundwinkel</li>      <li>Kollagenstimulierend (sekundär)</li>    </ul>    <div class="s-label">Einnahmehinweise</div>    <ul class="note-list">      <li>Topisch: 2× täglich auf gereinigte Haut</li>      <li>Wirkt am besten in Kombination mit GHK-Cu</li>      <li>Sichtbare Wirkung nach 4–8 Wochen</li>    </ul>  </div>  <div id="t35-side" class="tab-content">    <ul class="side-list">      <li>Sehr sicheres Profil</li>      <li>Leichte Hautreizung bei Überanwendung</li>      <li>Nicht für injizierbare Selbstanwendung geeignet</li>    </ul>  </div>  <div id="t35-dose" class="tab-content">    <div class="dose-box">      <div class="dose-item"><div class="dose-key">Topisch</div><div class="dose-val">2–4% in Serum</div></div>      <div class="dose-item"><div class="dose-key">Frequenz</div><div class="dose-val">2× täglich</div></div>      <div class="dose-item"><div class="dose-key">Wirkungseintritt</div><div class="dose-val">4–8 Wochen</div></div>      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Topisch bevorzugt</div></div>    </div>    <div class="s-label">Empfehlung</div>    <ul class="note-list"><li><strong style="color:var(--accent3)">Topisch ideal</strong> – einer der wenigen Peptide primär für Haut</li></ul>  </div>  <div id="t35-study" class="tab-content">    <div class="study-box">      <div class="study-item">        <span class="study-level study-pilot">Hersteller-Studien</span>        <p class="study-text">Lipotec-Studie: bis 63% Faltenreduktion nach 28 Tagen topischer Anwendung. SNARE-Hemmung in vitro gut belegt. Unabhängige Replizierung begrenzt.</p>      </div>    </div>  </div>  <div id="t35-price" class="tab-content">    <div class="price-box">      <div class="price-title">Aktuelle Marktpreise</div>      <div class="price-row"><span class="price-shop">Europa-Peptide (10mg)</span><span class="price-amount">€36,90</span></div>    </div>  </div></div><!-- 36 Thymalin --><div class="peptide-card" data-cat="aging" data-risk="low" data-search="thymalin thymus immunsystem anti-aging longevity zirbeldrüse">  <div class="card-top">    <div class="card-left">      <div class="card-nr">36 / 42 · IMMUNSYSTEM & ANTI-AGING</div>      <div class="card-name">Thymalin</div>      <div class="card-aka">Thymus-Extrakt-Peptid · Thalamid</div>    </div>    <div class="card-right">      <span class="cat-tag" style="color:#7fff6b;border-color:#7fff6b">Anti-Aging</span>      <span class="route-tag route-inject">💉 Injizierbar</span>      <span class="risk-tag risk-low">Risiko: Niedrig</span>    </div>  </div>  <div class="tabs">    <button class="tab-btn active" onclick="switchTab(this,'t36-eff')">Wirkung</button>    <button class="tab-btn" onclick="switchTab(this,'t36-side')">Nebenwirkungen</button>    <button class="tab-btn" onclick="switchTab(this,'t36-dose')">Dosierung</button>    <button class="tab-btn" onclick="switchTab(this,'t36-study')">Studien</button>    <button class="tab-btn" onclick="switchTab(this,'t36-price')">Preise</button>  </div>  <div id="t36-eff" class="tab-content active">    <ul class="effect-list">      <li>Reaktiviert Thymusfunktion im Alter</li>      <li>Stärkt zelluläre Immunität (T-Zellen)</li>      <li>Anti-Aging auf immunologischer Ebene</li>      <li>Antientzündlich & antioxidativ</li>      <li>Kombinierbar mit Epitalon (Longevity-Stack)</li>    </ul>    <div class="s-label">Einnahmehinweise</div>    <ul class="note-list">      <li>Kurweise: 10 Tage, 1–2×/Jahr</li>      <li>Kombination mit Epitalon beliebt (russische Longevity-Protokolle)</li>    </ul>  </div>  <div id="t36-side" class="tab-content">    <ul class="side-list">      <li>Sehr wenige bekannte Nebenwirkungen</li>      <li>Autoimmun-Stimulation bei Prädisposition theoretisch</li>      <li>Kaum westliche Humanstudien</li>    </ul>  </div>  <div id="t36-dose" class="tab-content">    <div class="dose-box">      <div class="dose-item"><div class="dose-key">Dosis</div><div class="dose-val">10 mg/Tag</div></div>      <div class="dose-item"><div class="dose-key">Kur</div><div class="dose-val">10 Tage</div></div>      <div class="dose-item"><div class="dose-key">Frequenz</div><div class="dose-val">1–2×/Jahr</div></div>      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan</div></div>    </div>  </div>  <div id="t36-study" class="tab-content">    <div class="study-box">      <div class="study-item">        <span class="study-level study-human">Russische Langzeitstudien</span>        <p class="study-text">Khavinson-Institut: 15-Jahres-Studie zeigt reduzierte Mortalität & verbesserte Immunfunktion. Kombination mit Epitalon in Longevity-Protokollen weit verbreitet in Russland.</p>      </div>    </div>  </div>  <div id="t36-price" class="tab-content">    <div class="price-box">      <div class="price-title">Aktuelle Marktpreise</div>      <div class="price-row"><span class="price-shop">Europa-Peptide (10mg)</span><span class="price-amount">€24,90</span></div>    </div>  </div></div><!-- 37 AHK-Cu --><div class="peptide-card" data-cat="kosmetik" data-risk="low" data-search="ahk-cu kupfer tripeptid haarwachstum haut kollagen anti-aging">  <div class="card-top">    <div class="card-left">      <div class="card-nr">37 / 42 · KOSMETIK & HAARE</div>      <div class="card-name">AHK-Cu</div>      <div class="card-aka">Ala-His-Lys-Kupfer · Kupfer-Tripeptid-2</div>    </div>    <div class="card-right">      <span class="cat-tag" style="color:#ff6b35;border-color:#ff6b35">Kosmetik</span>      <span class="route-tag route-topisch">🧴 Topisch</span>      <span class="route-tag route-inject">💉 Subkutan</span>      <span class="risk-tag risk-low">Risiko: Niedrig</span>    </div>  </div>  <div class="tabs">    <button class="tab-btn active" onclick="switchTab(this,'t37-eff')">Wirkung</button>    <button class="tab-btn" onclick="switchTab(this,'t37-side')">Nebenwirkungen</button>    <button class="tab-btn" onclick="switchTab(this,'t37-dose')">Dosierung</button>    <button class="tab-btn" onclick="switchTab(this,'t37-study')">Studien</button>    <button class="tab-btn" onclick="switchTab(this,'t37-price')">Preise</button>  </div>  <div id="t37-eff" class="tab-content active">    <ul class="effect-list">      <li>Stärkeres Haarwachstum als GHK-Cu</li>      <li>Hemmt DHT-Wirkung an Haarfollikeln</li>      <li>Fördert Kollagen & Elastin</li>      <li>Wundheilung & Geweberegeneration</li>      <li>Antioxidativ</li>    </ul>    <div class="s-label">Einnahmehinweise</div>    <ul class="note-list">      <li>Topisch direkt auf Kopfhaut / Gesicht</li>      <li>Nicht mit starken Oxidationsmitteln (Vitamin C) kombinieren</li>      <li>Regelmäßige Anwendung über 3–6 Monate</li>    </ul>  </div>  <div id="t37-side" class="tab-content">    <ul class="side-list">      <li>Sehr sicheres Profil</li>      <li>Lokale Reizung (selten)</li>      <li>Kupfer-Überdosierung theoretisch bei extremem Missbrauch</li>    </ul>  </div>  <div id="t37-dose" class="tab-content">    <div class="dose-box">      <div class="dose-item"><div class="dose-key">Topisch</div><div class="dose-val">1–5% in Serum</div></div>      <div class="dose-item"><div class="dose-key">Frequenz</div><div class="dose-val">1–2×/Tag</div></div>      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">3–6 Monate</div></div>      <div class="dose-item"><div class="dose-key">Empfehlung</div><div class="dose-val">Topisch optimal</div></div>    </div>  </div>  <div id="t37-study" class="tab-content">    <div class="study-box">      <div class="study-item">        <span class="study-level study-invitro">In-Vitro & Tier</span>        <p class="study-text">Stärkere Haarfollikel-Stimulation als GHK-Cu in Zellstudien. DHT-Hemmung an Follikeln beschrieben. Humanstudien ausständig.</p>      </div>    </div>  </div>  <div id="t37-price" class="tab-content">    <div class="price-box">      <div class="price-title">Aktuelle Marktpreise</div>      <div class="price-row"><span class="price-shop">Europa-Peptide (50mg)</span><span class="price-amount">€47,90</span></div>    </div>  </div></div><!-- 38 HCG --><div class="peptide-card" data-cat="libido" data-risk="med" data-search="hcg choriongonadotropin testosteron fruchtbarkeit pct hoden">  <div class="card-top">    <div class="card-left">      <div class="card-nr">38 / 42 · HORMONE & FERTILITÄT</div>      <div class="card-name">HCG</div>      <div class="card-aka">Humanes Choriongonadotropin · 5000 IU</div>    </div>    <div class="card-right">      <span class="cat-tag" style="color:#c46bff;border-color:#c46bff">Hormone</span>      <span class="route-tag route-inject">💉 Injizierbar</span>      <span class="risk-tag risk-med">Risiko: Mittel</span>    </div>  </div>  <div class="tabs">    <button class="tab-btn active" onclick="switchTab(this,'t38-eff')">Wirkung</button>    <button class="tab-btn" onclick="switchTab(this,'t38-side')">Nebenwirkungen</button>    <button class="tab-btn" onclick="switchTab(this,'t38-dose')">Dosierung</button>    <button class="tab-btn" onclick="switchTab(this,'t38-study')">Studien</button>    <button class="tab-btn" onclick="switchTab(this,'t38-price')">Preise</button>  </div>  <div id="t38-eff" class="tab-content active">    <ul class="effect-list">      <li>Stimuliert Testosteronproduktion in den Hoden</li>      <li>Erhält/restauriert Hodengröße bei Steroid-Suppression</li>      <li>Fruchtbarkeitsfördernd bei Hypogonadismus</li>      <li>PCT (Post Cycle Therapy) nach Steroidzyklen</li>      <li>Libido-steigernd durch erhöhtes Testosteron</li>    </ul>    <div class="s-label">Einnahmehinweise</div>    <ul class="note-list">      <li>PCT: nach Steroidzyklus 2–3 Wochen</li>      <li>Nicht mit aktiven Steroiden kombinieren (LH-Unterdrückung)</li>      <li>Ärztliche Kontrolle des Testosteronspiegels</li>    </ul>  </div>  <div id="t38-side" class="tab-content">    <ul class="side-list">      <li>Wassereinlagerungen</li>      <li>Gynäkomastie (Brustgewebe bei Männern)</li>      <li>Akne</li>      <li>Emotionale Schwankungen</li>      <li>Ovarielles Überstimulationssyndrom bei Frauen</li>      <li>Verschreibungspflichtig</li>    </ul>  </div>  <div id="t38-dose" class="tab-content">    <div class="dose-box">      <div class="dose-item"><div class="dose-key">PCT-Dosis</div><div class="dose-val">500–1000 IU 3×/Woche</div></div>      <div class="dose-item"><div class="dose-key">Fertilität</div><div class="dose-val">1500–5000 IU/Woche</div></div>      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan / IM</div></div>      <div class="dose-item"><div class="dose-key">Status</div><div class="dose-val">Verschreibungspfl.</div></div>    </div>  </div>  <div id="t38-study" class="tab-content">    <div class="study-box">      <div class="study-item">        <span class="study-level study-human">Klinisch zugelassen</span>        <p class="study-text">Gut untersuchtes Hormon. Zugelassen für Fruchtbarkeitsbehandlung & Hypogonadismus. Off-label im Sport für PCT weit verbreitet. Sicherheit bei medizinischer Anwendung gut belegt.</p>      </div>    </div>  </div>  <div id="t38-price" class="tab-content">    <div class="price-box">      <div class="price-title">Aktuelle Marktpreise</div>      <div class="price-row"><span class="price-shop">Europa-Peptide (5000 IU)</span><span class="price-amount">€42,90</span></div>    </div>  </div></div><!-- 39 Kisspeptin --><div class="peptide-card" data-cat="libido" data-risk="med" data-search="kisspeptin testosteron gnrh lh fsh libido fertilität hypogonadismus">  <div class="card-top">    <div class="card-left">      <div class="card-nr">39 / 42 · HORMONE & LIBIDO</div>      <div class="card-name">Kisspeptin-10</div>      <div class="card-aka">Metastin · GnRH-Aktivator</div>    </div>    <div class="card-right">      <span class="cat-tag" style="color:#c46bff;border-color:#c46bff">Hormone</span>      <span class="route-tag route-inject">💉 Injizierbar</span>      <span class="risk-tag risk-med">Risiko: Mittel</span>    </div>  </div>  <div class="tabs">    <button class="tab-btn active" onclick="switchTab(this,'t39-eff')">Wirkung</button>    <button class="tab-btn" onclick="switchTab(this,'t39-side')">Nebenwirkungen</button>    <button class="tab-btn" onclick="switchTab(this,'t39-dose')">Dosierung</button>    <button class="tab-btn" onclick="switchTab(this,'t39-study')">Studien</button>    <button class="tab-btn" onclick="switchTab(this,'t39-price')">Preise</button>  </div>  <div id="t39-eff" class="tab-content active">    <ul class="effect-list">      <li>Aktiviert GnRH → stimuliert LH & FSH</li>      <li>Erhöht Testosteron auf natürlichem Weg</li>      <li>Libido-steigernd & fruchtbarkeitsfördernd</li>      <li>Kein direkter Androgeneffekt → HPTA bleibt intakt</li>      <li>Relevant bei Hypogonadismus & niedrigem T</li>    </ul>  </div>  <div id="t39-side" class="tab-content">    <ul class="side-list">      <li>Flush / Wärmegefühl</li>      <li>Kopfschmerzen</li>      <li>Hormonschwankungen möglich</li>      <li>Begrenzte klinische Daten</li>    </ul>  </div>  <div id="t39-dose" class="tab-content">    <div class="dose-box">      <div class="dose-item"><div class="dose-key">Dosis</div><div class="dose-val">0,1–1 mcg/kg</div></div>      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan / IV</div></div>      <div class="dose-item"><div class="dose-key">Frequenz</div><div class="dose-val">Pulsatil (2×/Tag)</div></div>      <div class="dose-item"><div class="dose-key">Monitoring</div><div class="dose-val">Testosteron messen</div></div>    </div>  </div>  <div id="t39-study" class="tab-content">    <div class="study-box">      <div class="study-item">        <span class="study-level study-human">Pilot-Humanstudien</span>        <p class="study-text">Mehrere Phase-I/II-Studien belegen LH- & Testosteronanstieg. Reproduktionsmedizin: gut beschrieben. Performance-Nutzung noch weitgehend anekdotisch.</p>      </div>    </div>  </div>  <div id="t39-price" class="tab-content">    <div class="price-box">      <div class="price-title">Aktuelle Marktpreise</div>      <div class="price-row"><span class="price-shop">Europa-Peptide (5mg)</span><span class="price-amount">€38,90</span></div>    </div>  </div></div><!-- 40 CJC-1295 mit DAC --><div class="peptide-card" data-cat="wachstum" data-risk="med" data-search="cjc-1295 dac wachstumshormon lang anhaltend wochendosis muskelaufbau">  <div class="card-top">    <div class="card-left">      <div class="card-nr">40 / 42 · WACHSTUMSHORMON</div>      <div class="card-name">CJC-1295 mit DAC</div>      <div class="card-aka">Drug Affinity Complex · Wochen-GH-Releaser</div>    </div>    <div class="card-right">      <span class="cat-tag" style="color:#00e5ff;border-color:#00e5ff">Wachstumshormon</span>      <span class="route-tag route-inject">💉 Injizierbar</span>      <span class="risk-tag risk-med">Risiko: Mittel</span>    </div>  </div>  <div class="tabs">    <button class="tab-btn active" onclick="switchTab(this,'t40-eff')">Wirkung</button>    <button class="tab-btn" onclick="switchTab(this,'t40-side')">Nebenwirkungen</button>    <button class="tab-btn" onclick="switchTab(this,'t40-dose')">Dosierung</button>    <button class="tab-btn" onclick="switchTab(this,'t40-study')">Studien</button>    <button class="tab-btn" onclick="switchTab(this,'t40-price')">Preise</button>  </div>  <div id="t40-eff" class="tab-content active">    <ul class="effect-list">      <li>Extrem lange Halbwertszeit (6–8 Tage durch DAC)</li>      <li>1× wöchentliche Injektion reicht aus</li>      <li>Kontinuierliche GH-Freisetzung über die Woche</li>      <li>Muskelaufbau, Fettabbau & Regeneration</li>      <li>IGF-1-Erhöhung nachgewiesen</li>    </ul>    <div class="s-label">Einnahmehinweise</div>    <ul class="note-list">      <li>1× wöchentlich – kein tägliches Spritzen nötig</li>      <li>Vorteil gegenüber Mod GRF: weniger Injektionen</li>      <li>Trotzdem nüchtern injizieren</li>    </ul>  </div>  <div id="t40-side" class="tab-content">    <ul class="side-list">      <li>Wasserretention stärker als ohne DAC</li>      <li>Kribbeln & Taubheitsgefühl</li>      <li>Insulinresistenz bei Langzeitnutzung</li>      <li>GH-Bleed (dauerhaft erhöhter GH) möglich</li>    </ul>  </div>  <div id="t40-dose" class="tab-content">    <div class="dose-box">      <div class="dose-item"><div class="dose-key">Dosis</div><div class="dose-val">1–2 mg/Woche</div></div>      <div class="dose-item"><div class="dose-key">Frequenz</div><div class="dose-val">1×/Woche</div></div>      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan</div></div>      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">8–16 Wochen</div></div>    </div>  </div>  <div id="t40-study" class="tab-content">    <div class="study-box">      <div class="study-item">        <span class="study-level study-human">Klinische Studien</span>        <p class="study-text">Humanstudien belegen Wochen-lange GH- & IGF-1-Erhöhung nach Einzelinjektion. Dosisabhängig und gut toleriert. Vorteil bei Compliance durch wöchentliche Gabe.</p>      </div>    </div>  </div>  <div id="t40-price" class="tab-content">    <div class="price-box">      <div class="price-title">Aktuelle Marktpreise</div>      <div class="price-row"><span class="price-shop">Europa-Peptide (5mg)</span><span class="price-amount">€64,90</span></div>    </div>  </div></div><!-- 41 L-Carnitin --><div class="peptide-card" data-cat="gewicht" data-risk="low" data-search="l-carnitin fettverbrennung energie ausdauer herzgesundheit mitochondrien">  <div class="card-top">    <div class="card-left">      <div class="card-nr">41 / 42 · METABOLISMUS & ENERGIE</div>      <div class="card-name">L-Carnitin</div>      <div class="card-aka">Aminosäure-Derivat · Fetttransporter</div>    </div>    <div class="card-right">      <span class="cat-tag" style="color:#ff6b35;border-color:#ff6b35">Metabolismus</span>      <span class="route-tag route-inject">💉 Injizierbar</span>      <span class="route-tag route-oral">💊 Oral</span>      <span class="risk-tag risk-low">Risiko: Niedrig</span>    </div>  </div>  <div class="tabs">    <button class="tab-btn active" onclick="switchTab(this,'t41-eff')">Wirkung</button>    <button class="tab-btn" onclick="switchTab(this,'t41-side')">Nebenwirkungen</button>    <button class="tab-btn" onclick="switchTab(this,'t41-dose')">Dosierung</button>    <button class="tab-btn" onclick="switchTab(this,'t41-study')">Studien</button>    <button class="tab-btn" onclick="switchTab(this,'t41-price')">Preise</button>  </div>  <div id="t41-eff" class="tab-content active">    <ul class="effect-list">      <li>Transportiert Fettsäuren in Mitochondrien zur Verbrennung</li>      <li>Verbessert Ausdauer & Energieeffizienz</li>      <li>Herzgesundheit & kardiovaskulärer Schutz</li>      <li>Regeneration nach Training</li>      <li>Gehirnfunktion (Acetyl-L-Carnitin-Variante)</li>      <li>Männliche Fruchtbarkeit (Spermienqualität)</li>    </ul>    <div class="s-label">Einnahmehinweise</div>    <ul class="note-list">      <li>IV/subkutan: deutlich besser bioverfügbar als oral</li>      <li>Vor dem Training für maximale Fettverbrennung</li>      <li>Oral: 2–3g/Tag mit Mahlzeit</li>    </ul>  </div>  <div id="t41-side" class="tab-content">    <ul class="side-list">      <li>Fischiger Körpergeruch (bei oraler Hochdosis)</li>      <li>Magen-Darm-Beschwerden (oral)</li>      <li>TMAO-Erhöhung (kardiovaskuläres Risiko diskutiert)</li>      <li>Sehr sicheres allgemeines Profil</li>    </ul>  </div>  <div id="t41-dose" class="tab-content">    <div class="dose-box">      <div class="dose-item"><div class="dose-key">IV/Subkutan</div><div class="dose-val">500–2000 mg/Tag</div></div>      <div class="dose-item"><div class="dose-key">Oral</div><div class="dose-val">2–4 g/Tag</div></div>      <div class="dose-item"><div class="dose-key">Timing</div><div class="dose-val">Vor dem Training</div></div>      <div class="dose-item"><div class="dose-key">Empfehlung</div><div class="dose-val">IV überlegen</div></div>    </div>    <div class="s-label">Empfehlung</div>    <ul class="note-list"><li><strong style="color:var(--accent)">IV/Subkutan empfohlen</strong> für deutlich höhere Bioverfügbarkeit (oral nur ~15%)</li></ul>  </div>  <div id="t41-study" class="tab-content">    <div class="study-box">      <div class="study-item">        <span class="study-level study-human">Mehrere klinische Studien</span>        <p class="study-text">Gut untersuchtes Supplement. Herzstudien: klarer Schutzeffekt post-Infarkt. Ausdauer-Meta-Analysen: moderater positiver Effekt. TMAO-Debatte: Zusammenhang mit Herzrisiko unklar.</p>      </div>    </div>  </div>  <div id="t41-price" class="tab-content">    <div class="price-box">      <div class="price-title">Aktuelle Marktpreise</div>      <div class="price-row"><span class="price-shop">Europa-Peptide (10ml)</span><span class="price-amount">€29,90</span></div>    </div>  </div></div><!-- 42 Vitamin B12 --><div class="peptide-card" data-cat="neuro" data-risk="low" data-search="vitamin b12 energie nerven blutbildung müdigkeit vegetarier methylcobalamin">  <div class="card-top">    <div class="card-left">      <div class="card-nr">42 / 42 · ENERGIE & NERVEN</div>      <div class="card-name">Vitamin B12</div>      <div class="card-aka">Methylcobalamin / Cyanocobalamin · injizierbar</div>    </div>    <div class="card-right">      <span class="cat-tag" style="color:#c46bff;border-color:#c46bff">Neuro</span>      <span class="route-tag route-inject">💉 Injizierbar</span>      <span class="route-tag route-oral">💊 Oral</span>      <span class="risk-tag risk-low">Risiko: Niedrig</span>    </div>  </div>  <div class="tabs">    <button class="tab-btn active" onclick="switchTab(this,'t42-eff')">Wirkung</button>    <button class="tab-btn" onclick="switchTab(this,'t42-side')">Nebenwirkungen</button>    <button class="tab-btn" onclick="switchTab(this,'t42-dose')">Dosierung</button>    <button class="tab-btn" onclick="switchTab(this,'t42-study')">Studien</button>    <button class="tab-btn" onclick="switchTab(this,'t42-price')">Preise</button>  </div>  <div id="t42-eff" class="tab-content active">    <ul class="effect-list">      <li>Essenziell für Nervengesundheit & Myelinscheide</li>      <li>Blutbildung & Sauerstofftransport</li>      <li>Energiestoffwechsel in allen Zellen</li>      <li>DNA-Synthese & Zellteilung</li>      <li>Reduziert Homocystein (kardiovaskulär)</li>      <li>Stimmungsaufhellend bei Mangel</li>    </ul>    <div class="s-label">Einnahmehinweise</div>    <ul class="note-list">      <li>Injektion: Sofortwirkung, vollständige Absorption</li>      <li>Oral: hohe Dosis nötig (99% wird nicht resorbiert)</li>      <li>Besonders wichtig für Vegetarier/Veganer</li>    </ul>  </div>  <div id="t42-side" class="tab-content">    <ul class="side-list">      <li>Sehr sicheres wasserlösliches Vitamin</li>      <li>Akne bei sehr hohen Dosen möglich</li>      <li>Rötung an Einstichstelle</li>      <li>Allergische Reaktion auf Zusatzstoffe (selten)</li>    </ul>  </div>  <div id="t42-dose" class="tab-content">    <div class="dose-box">      <div class="dose-item"><div class="dose-key">Injektion</div><div class="dose-val">1000 mcg/Woche</div></div>      <div class="dose-item"><div class="dose-key">Oral</div><div class="dose-val">1000–2000 mcg/Tag</div></div>      <div class="dose-item"><div class="dose-key">Mangel-Therapie</div><div class="dose-val">1mg/Tag × 1 Woche</div></div>      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">IM / Subkutan</div></div>    </div>    <div class="s-label">Empfehlung</div>    <ul class="note-list"><li><strong style="color:var(--accent)">Injektion klar überlegen</strong> – orale Bioverfügbarkeit extrem gering bei Mangel</li></ul>  </div>  <div id="t42-study" class="tab-content">    <div class="study-box">      <div class="study-item">        <span class="study-level study-human">Sehr gut belegt (Jahrzehnte)</span>        <p class="study-text">Eines der am besten erforschten Vitamine. Mangel klar mit Neuropathie, Anämie & Demenz-Risiko verknüpft. Supplementation bei Mangel klinisch eindeutig wirksam.</p>      </div>    </div>  </div>  <div id="t42-price" class="tab-content">    <div class="price-box">      <div class="price-title">Aktuelle Marktpreise</div>      <div class="price-row"><span class="price-shop">Europa-Peptide (10ml)</span><span class="price-amount">€29,90</span></div>    </div>  </div></div>
+
+<!-- 29 AOD-9604 -->
+
+
+
+<!-- 43 GHRP-2 -->
+<div class="peptide-card" data-cat="wachstum" data-risk="med" data-search="ghrp-2 pralmorelin wachstumshormon gh-releaser muskelaufbau stärker ghrp-6">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">43 / 47 · WACHSTUMSHORMON</div>
+      <div class="card-name">GHRP-2</div>
+      <div class="card-aka">Pralmorelin · Growth Hormone Releasing Peptide-2</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#00e5ff;border-color:#00e5ff">Wachstumshormon</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="risk-tag risk-med">Risiko: Mittel</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t43-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t43-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t43-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t43-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t43-price')">Preise</button>
+  </div>
+  <div id="t43-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Stärkere GH-Freisetzung als GHRP-6</li>
+      <li>Weniger Appetitanregung als GHRP-6</li>
+      <li>Muskelaufbau & Fettstoffwechsel</li>
+      <li>Anti-katabol (schützt Muskelmasse)</li>
+      <li>Synergistisch mit GHRH-Peptiden (CJC-1295)</li>
+    </ul>
+    <div class="s-label">Einnahmehinweise</div>
+    <ul class="note-list">
+      <li>Nüchtern injizieren (min. 2h nach Mahlzeit)</li>
+      <li>2–3× täglich für optimale GH-Pulse</li>
+      <li>Mit CJC-1295 ohne DAC kombinierbar</li>
+    </ul>
+  </div>
+  <div id="t43-side" class="tab-content">
+    <ul class="side-list">
+      <li>Cortisol- & Prolaktinanstieg (stärker als Ipamorelin)</li>
+      <li>Wasserretention</li>
+      <li>Kribbeln & Taubheit in Extremitäten</li>
+      <li>Kopfschmerzen</li>
+      <li>Insulinresistenz bei Langzeitnutzung</li>
+    </ul>
+  </div>
+  <div id="t43-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Dosis</div><div class="dose-val">100–300 mcg</div></div>
+      <div class="dose-item"><div class="dose-key">Frequenz</div><div class="dose-val">2–3×/Tag</div></div>
+      <div class="dose-item"><div class="dose-key">Timing</div><div class="dose-val">Nüchtern</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan</div></div>
+    </div>
+    <div class="s-label">Vergleich Ipamorelin vs GHRP-2</div>
+    <ul class="note-list">
+      <li>Ipamorelin: sicherer, kein Cortisol – bevorzugt für Einsteiger</li>
+      <li>GHRP-2: stärkerer GH-Puls, aber mehr Nebenwirkungen</li>
+    </ul>
+  </div>
+  <div id="t43-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-human">Klinische Studien</span>
+        <p class="study-text">Gut untersuchter GH-Sekretagogum. Cortisol- und Prolaktinanstieg klinisch bestätigt. GH-Puls stärker als bei Ipamorelin, aber weniger selektiv. Phase-II-Daten vorhanden.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t43-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Verfügbar bei Peptid-Shops (Research)</span><span class="price-amount">~€25–40/5mg</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 44 Follistatin-344 -->
+<div class="peptide-card" data-cat="wachstum" data-risk="high" data-search="follistatin-344 myostatin muskelwachstum kraft muskeln extrem">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">44 / 47 · MUSKELWACHSTUM</div>
+      <div class="card-name">Follistatin-344</div>
+      <div class="card-aka">FST-344 · Myostatin-Inhibitor</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#ff4455;border-color:#ff4455">⚠ Hochrisiko</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="risk-tag risk-high">Risiko: Hoch</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t44-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t44-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t44-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t44-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t44-price')">Preise</button>
+  </div>
+  <div id="t44-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Hemmt Myostatin → massives Muskelwachstum</li>
+      <li>Fördert Muskelfaser-Neubildung (Hyperplasie)</li>
+      <li>Erhöhte Kraftausdauer</li>
+      <li>Fördert Fettverlust</li>
+      <li>Schnellste Muskelmasse-Zunahme aller Peptide</li>
+    </ul>
+    <div class="s-label">⚠ Wichtige Warnhinweise</div>
+    <ul class="note-list">
+      <li>Eines der gefährlichsten Peptide bei Missbrauch</li>
+      <li>Unkontrolliertes Organwachstum möglich</li>
+      <li>Nur mit engmaschiger ärztlicher Überwachung</li>
+      <li>Sehr kurze Zyklen (max. 10–14 Tage)</li>
+    </ul>
+  </div>
+  <div id="t44-side" class="tab-content">
+    <ul class="side-list">
+      <li>Organvergrößerung (Herz, Milz, Leber)</li>
+      <li>Unkontrolliertes Gewebewachstum</li>
+      <li>Krebsrisiko (fördert alle Zelltypen)</li>
+      <li>Hormonelle Dysbalancen</li>
+      <li>Kaum Humanstudien – hohes Unbekanntheitsrisiko</li>
+      <li>Reproduktionstoxizität möglich</li>
+    </ul>
+  </div>
+  <div id="t44-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Dosis</div><div class="dose-val">50–100 mcg/Tag</div></div>
+      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">Max. 10–14 Tage!</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Intramuskulär</div></div>
+      <div class="dose-item"><div class="dose-key">Warnung</div><div class="dose-val">⚠⚠ Hochrisiko</div></div>
+    </div>
+  </div>
+  <div id="t44-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-animal">Tierversuch</span>
+        <p class="study-text">Drastisches Muskelwachstum in Tiermodellen. Myostatin-Hemmung gut beschrieben. Bei Kindern mit Myostatin-Mutation: natürliche außergewöhnliche Muskulatur belegt. Humanstudien für Performance fehlen.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t44-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise (Research)</div>
+      <div class="price-row"><span class="price-shop">Diverse Research-Shops</span><span class="price-amount">~€60–120/1mg</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 45 Thymosin Alpha-1 -->
+<div class="peptide-card" data-cat="aging" data-risk="low" data-search="thymosin alpha-1 ta1 thymalfasin zadaxin immunsystem krebs hepatitis covid">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">45 / 47 · IMMUNSYSTEM</div>
+      <div class="card-name">Thymosin Alpha-1</div>
+      <div class="card-aka">Tα1 · Thymalfasin · Zadaxin</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#7fff6b;border-color:#7fff6b">Immunsystem</span>
+      <span class="route-tag route-inject">💉 Injizierbar</span>
+      <span class="risk-tag risk-low">Risiko: Niedrig</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t45-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t45-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t45-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t45-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t45-price')">Preise</button>
+  </div>
+  <div id="t45-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Aktiviert T-Zellen & NK-Zellen</li>
+      <li>Adjuvante Therapie bei Krebs & Virusinfektionen</li>
+      <li>Wirksam bei chronischer Hepatitis B & C</li>
+      <li>Reduzierte COVID-19-Schwere (Studien 2020–21)</li>
+      <li>Anti-Aging des Immunsystems</li>
+      <li>Optimiert Impfantwort</li>
+    </ul>
+    <div class="s-label">Einnahmehinweise</div>
+    <ul class="note-list">
+      <li>2× wöchentlich subkutan</li>
+      <li>Kuren von 6–12 Wochen üblich</li>
+      <li>Auch als Prävention in Infektionszeiten genutzt</li>
+    </ul>
+  </div>
+  <div id="t45-side" class="tab-content">
+    <ul class="side-list">
+      <li>Sehr sicheres Profil</li>
+      <li>Lokale Reaktionen an Einstichstelle</li>
+      <li>Autoimmun-Trigger bei bestehender Autoimmunerkrankung möglich</li>
+    </ul>
+  </div>
+  <div id="t45-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Dosis</div><div class="dose-val">1,6 mg 2×/Woche</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Subkutan</div></div>
+      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">6–12 Wochen</div></div>
+      <div class="dose-item"><div class="dose-key">Prävention</div><div class="dose-val">1× wöchentlich</div></div>
+    </div>
+  </div>
+  <div id="t45-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-human">FDA Orphan Drug + klinisch zugelassen</span>
+        <p class="study-text">In 37 Ländern zugelassen (Zadaxin). Hepatitis B/C: Ansprechen erhöht. COVID-19-Studien (2021): schwere Verläufe reduziert. Krebsbegleittherapie: Immunstatus verbessert. Eines der am besten belegten Immunpeptide.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t45-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide (10mg)</span><span class="price-amount">€39,90</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 46 5-Amino-1MQ -->
+<div class="peptide-card" data-cat="gewicht" data-risk="med" data-search="5-amino-1mq nnmt fettabbau oral kapseln metabolismus nad energie">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">46 / 47 · METABOLISMUS</div>
+      <div class="card-name">5-Amino-1MQ</div>
+      <div class="card-aka">NNMT-Inhibitor · Oral aktiv</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#ff6b35;border-color:#ff6b35">Metabolismus</span>
+      <span class="route-tag route-oral">💊 Oral</span>
+      <span class="risk-tag risk-med">Risiko: Mittel</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t46-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t46-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t46-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t46-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t46-price')">Preise</button>
+  </div>
+  <div id="t46-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Hemmt NNMT-Enzym → aktiviert Fettzell-Stoffwechsel</li>
+      <li>Fettabbau ohne Kalorienreduktion (Tierstudien)</li>
+      <li>Erhöhte NAD+-Spiegel (Anti-Aging-Effekt)</li>
+      <li>Verbesserte Insulinsensitivität</li>
+      <li><strong style="color:var(--accent3)">Oral bioverfügbar</strong> – kein Spritzen nötig</li>
+      <li>Schutz vor diätinduzierter Fettleibigkeit</li>
+    </ul>
+    <div class="s-label">Einnahmehinweise</div>
+    <ul class="note-list">
+      <li>Morgens mit oder ohne Mahlzeit</li>
+      <li>Kein Injizieren nötig – ideal für Spritzen-Vermeidung</li>
+      <li>Kombination mit Semaglutid synergistisch diskutiert</li>
+    </ul>
+  </div>
+  <div id="t46-side" class="tab-content">
+    <ul class="side-list">
+      <li>Keine etablierten Humanstudien</li>
+      <li>Magen-Darm-Beschwerden möglich</li>
+      <li>Langzeitwirkungen unbekannt</li>
+      <li>Mögliche Wechselwirkungen mit Methylierungspfaden</li>
+    </ul>
+  </div>
+  <div id="t46-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Dosis</div><div class="dose-val">5–50 mg/Tag</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Oral (Kapsel)</div></div>
+      <div class="dose-item"><div class="dose-key">Timing</div><div class="dose-val">Morgens</div></div>
+      <div class="dose-item"><div class="dose-key">Zyklus</div><div class="dose-val">4–8 Wochen</div></div>
+    </div>
+    <div class="s-label">Empfehlung</div>
+    <ul class="note-list"><li><strong style="color:var(--accent3)">Oral ideal</strong> – einer der wenigen oral aktiven Metabolismus-Peptide</li></ul>
+  </div>
+  <div id="t46-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-animal">Tierversuch (2019–2022)</span>
+        <p class="study-text">Mäuse: signifikante Gewichtsreduktion ohne Kalorienreduktion. NNMT-Hemmung als Mechanismus gut verstanden. UCLA & andere Institute aktiv forschend. Humanstudien in Vorbereitung.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t46-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide (5mg)</span><span class="price-amount">€34,90</span></div>
+      <div class="price-row"><span class="price-shop">Europa-Peptide (50mg)</span><span class="price-amount">€139,00</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 47 SLU-PP-332 -->
+<div class="peptide-card" data-cat="gewicht" data-risk="med" data-search="slu-pp-332 ausdauer sport exercise mimetic err agonist kapseln oral">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-nr">47 / 47 · PERFORMANCE & AUSDAUER</div>
+      <div class="card-name">SLU-PP-332</div>
+      <div class="card-aka">ERRα/γ-Agonist · Exercise Mimetic</div>
+    </div>
+    <div class="card-right">
+      <span class="cat-tag" style="color:#ff6b35;border-color:#ff6b35">Performance</span>
+      <span class="route-tag route-oral">💊 Oral (Kapseln)</span>
+      <span class="route-tag route-inject">💉 Subkutan</span>
+      <span class="risk-tag risk-med">Risiko: Mittel</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t47-eff')">Wirkung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t47-side')">Nebenwirkungen</button>
+    <button class="tab-btn" onclick="switchTab(this,'t47-dose')">Dosierung</button>
+    <button class="tab-btn" onclick="switchTab(this,'t47-study')">Studien</button>
+    <button class="tab-btn" onclick="switchTab(this,'t47-price')">Preise</button>
+  </div>
+  <div id="t47-eff" class="tab-content active">
+    <ul class="effect-list">
+      <li>Aktiviert ERRα/γ-Rezeptoren → simuliert Sport-Effekte</li>
+      <li>Erhöhte Mitochondriendichte & Ausdauer</li>
+      <li>Fettabbau ohne Sport (in Tiermodellen dramatisch)</li>
+      <li>Muskelfaser-Umwandlung zu Typ-1 (Ausdauer)</li>
+      <li>Herzgesundheit & kardiovaskuläre Effizienz</li>
+      <li>Genannt "Couch Potato Pill" – Sport ohne Sport</li>
+    </ul>
+    <div class="s-label">Einnahmehinweise</div>
+    <ul class="note-list">
+      <li>Oral als Kapsel – sehr bequem</li>
+      <li>Morgens vor dem Training oder nüchtern</li>
+      <li>Noch keine etablierten Humanprotokolle</li>
+    </ul>
+  </div>
+  <div id="t47-side" class="tab-content">
+    <ul class="side-list">
+      <li>Keine Humanstudien – Sicherheit unklar</li>
+      <li>Herzrhythmusstörungen theoretisch (ERR-Aktivierung)</li>
+      <li>Hormonelle Effekte (ERR beeinflusst Östrogen-Pfade)</li>
+      <li>Langzeitwirkungen völlig unbekannt</li>
+    </ul>
+  </div>
+  <div id="t47-dose" class="tab-content">
+    <div class="dose-box">
+      <div class="dose-item"><div class="dose-key">Kapsel-Dosis</div><div class="dose-val">300 mcg × 1–3/Tag</div></div>
+      <div class="dose-item"><div class="dose-key">Subkutan</div><div class="dose-val">5–20 mg/Tag</div></div>
+      <div class="dose-item"><div class="dose-key">Anwendung</div><div class="dose-val">Oral bevorzugt</div></div>
+      <div class="dose-item"><div class="dose-key">Status</div><div class="dose-val">⚠ Experimentell</div></div>
+    </div>
+  </div>
+  <div id="t47-study" class="tab-content">
+    <div class="study-box">
+      <div class="study-item">
+        <span class="study-level study-animal">Tierversuch (2023, Science-Publikation)</span>
+        <p class="study-text">Aufsehenerregende Studie: Mäuse ohne Training deutlich fitter, höhere Ausdauer, Fettverlust. ERRα/γ als neuer Ansatz für Adipositas & Herzversagen. Weltweite Medienaufmerksamkeit 2023. Keine Humanstudien.</p>
+      </div>
+    </div>
+  </div>
+  <div id="t47-price" class="tab-content">
+    <div class="price-box">
+      <div class="price-title">Aktuelle Marktpreise</div>
+      <div class="price-row"><span class="price-shop">Kronen-Peptide (5mg)</span><span class="price-amount">€36,90</span></div>
+      <div class="price-row"><span class="price-shop">Europa-Peptide (300mcg × 100 Kaps.)</span><span class="price-amount sale">€79,90 <small style="color:var(--muted);text-decoration:line-through">€89,00</small></span></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end grid -->
+
+<footer>
+  <div>
+    <div class="footer-logo">PeptidBase</div>
+    <div style="margin-top:4px">Forschungs-Referenzdatenbank 2025 · Nur zu Bildungszwecken</div>
+  </div>
+  <div style="text-align:right">
+    Quellen: peptid24.de · kronen-peptide.com · europa-peptide.com<br>
+    Alle Angaben ohne Gewähr · Kein medizinischer Rat
+  </div>
+</footer>
+
+<script>
+let activeFilter = 'all';
+let activeRisk = 'all';
+
+function setFilter(cat, btn) {
+  activeFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    if (b.textContent.trim() === btn.textContent.trim()) b.classList.add('active');
+    else if (['Alle','Heilung','Wachstumshormon','Gewicht','Libido','Anti-Aging','Neuro/Schlaf','Kosmetik','Stacks','Performance'].includes(b.textContent.trim())) b.classList.remove('active');
+  });
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function setRisk(risk, btn) {
+  activeRisk = risk;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    if (['Alle','Niedrig','Mittel','Hoch'].includes(b.textContent.trim())) b.classList.remove('active');
+  });
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const cards = document.querySelectorAll('.peptide-card');
+  let visible = 0;
+  cards.forEach(card => {
+    const cat = card.dataset.cat;
+    const risk = card.dataset.risk;
+    const search = card.dataset.search;
+    const name = card.querySelector('.card-name').textContent.toLowerCase();
+    const catMatch = activeFilter === 'all' || cat === activeFilter;
+    const riskMatch = activeRisk === 'all' || risk === activeRisk;
+    const textMatch = !q || name.includes(q) || search.includes(q);
+    if (catMatch && riskMatch && textMatch) {
+      card.classList.remove('hidden');
+      visible++;
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+  document.getElementById("countNum").textContent = visible;
+}
+
+function filterPeptides() { applyFilters(); }
+
+function switchTab(btn, targetId) {
+  const card = btn.closest('.peptide-card');
+  card.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  card.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(targetId).classList.add('active');
+}
+</script>
+</body>
+</html>
